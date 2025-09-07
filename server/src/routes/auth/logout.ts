@@ -6,14 +6,14 @@ router.post("/logout", async (req: Request, res: Response) => {
   // Clear cookies only
   res.clearCookie("accessToken", {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
   });
 
   res.clearCookie("refreshToken", {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
   });
 
   return res.status(200).json({ message: "Logged out successfully" });

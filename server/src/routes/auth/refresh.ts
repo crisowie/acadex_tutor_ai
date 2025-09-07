@@ -26,8 +26,8 @@ router.post('/refresh-token', (req: Request, res: Response) => {
     );
     res.cookie('accessToken', newAccessToken, {
       httpOnly: true,
-      secure: false, // set to true in production with HTTPS
-      sameSite: 'lax',
+      secure: true, // set to true in production with HTTPS
+      sameSite: 'none',
       maxAge: 1000 * 60 * 60,
     });
 
