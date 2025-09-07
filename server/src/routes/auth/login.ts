@@ -42,15 +42,15 @@ router.post("/signin", async (req: Request, res: Response) => {
     // Set cookies
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: false,
+      sameSite: "lax",
       maxAge: 1000 * 60 * 60 
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: false,
+      sameSite: "lax",
       maxAge: 1000 * 60 * 60 * 24 ,
     });
 

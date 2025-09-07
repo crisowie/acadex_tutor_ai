@@ -42,14 +42,15 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
       const aiReply = res.data.reply;
       const returnedChatId = res.data.chat_id;
+      const resources = res.data.resources || []
 
       if (!chatId) setChatId(returnedChatId); // store it if it’s a new chat
 
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: aiReply },
+        { role: "assistant", content: aiReply, resources },
       ]);
-      return aiReply;
+      return { aiReply, resources };
     } catch (err) {
       console.error("Chat error:", err);
       const errorReply = "Sorry, I couldn't respond.";
@@ -98,9 +99,13 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     await refresh()
   };
 
-  useEffect(()=>{
-    refresh()
-  },[])
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refresh();
+    }, 60000); // Refresh every minute
+
+    return () => clearInterval(interval);
+  }, []);
 
   const loadChatHistory = async (id: string) => {
     try {
@@ -123,8 +128,29 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     }
   };
 
+  const fetchSingleChat = async (id: string) => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`/api/chat-history/${id}`);
+      if (res.data?.messages) {
+        setMessages(
+          res.data.messages.map((chat: any) => ({
+            ...chat,
+            timestamp: new Date(chat.timestamp || chat.created_at),
+          }))
+        );
+
+        setChatId(id); // store this chat as current
+      }
+    } catch (error) {
+      console.error("Failed to load chat history:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <ChatContext.Provider value={{ messages, setMessages, sendMessage, loading, chatId, loadChatHistory, startNewChat, chats, setChat }}>
+    <ChatContext.Provider value={{ messages, setMessages, sendMessage, loading, chatId, loadChatHistory, startNewChat, chats, setChat, fetchSingleChat }}>
       {children}
     </ChatContext.Provider>
   );

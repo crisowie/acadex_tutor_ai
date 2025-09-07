@@ -5,8 +5,8 @@ import { AuthContextType } from "../types";
 
 // Axios global setup
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "https://acadex-tutor-ai.onrender.com";
-// axios.defaults.baseURL ="http://localhost:5050";
+// axios.defaults.baseURL = "https://acadex-tutor-ai.onrender.com";
+axios.defaults.baseURL ="http://localhost:5050";
 // Create Auth Context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -141,6 +141,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading(false);
     }
   };
+  // Onboarding
+  const Onboarding = async (learning_goal: string, skill_level: string,custom_goal: string): Promise<boolean> => {
+    setLoading(true);
+    try {
+      const { data } = await axios.post("/auth/onboarding", { learning_goal, skill_level,custom_goal });
+      setUser(data.user);
+      await fetchUser(); 
+      return true;
+    } catch (err: any) {
+      console.error("Login Error:", err.response?.data?.error || err.message);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
 
 
   // Logout
@@ -194,6 +212,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         signup,
         setUser,
         loading,
+        Onboarding,
         UpdateProfile,
       }}
     >

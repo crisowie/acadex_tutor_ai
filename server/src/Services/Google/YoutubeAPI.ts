@@ -1,7 +1,7 @@
 // routes/youtube.ts
 import express from "express";
 import axios from "axios";
-import { authMiddleware } from "../config/middleware";
+import { authMiddleware } from "../../config/middleware";
 
 const router = express.Router();
 
@@ -41,7 +41,7 @@ router.get("/search", authMiddleware, async (req, res) => {
       params: {
         q: `${q} tutorial OR lecture OR course OR lesson OR class`,
         part: "snippet",
-        maxResults: 13,
+        maxResults: 20,
         type: "video",
         videoDuration: "long",
         videoCategoryId: "27", // Education

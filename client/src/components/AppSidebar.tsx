@@ -7,7 +7,9 @@ import {
   Lightbulb,
   LightbulbIcon,
   LayoutDashboard,
-  User
+  User,
+  Brain,
+  Users2,
 } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -31,9 +33,10 @@ import { useChat } from "@/context/ChatContext";
 const navigation = [
   { title: "Ask A Question", url: "/ask", icon: MessageSquare, action: "new-chat" },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  // { title: "Quizzes", url: "/quizzes", icon: BookOpen },
+  { title: "Quizzes", url: "/quizzes", icon: BookOpen },
   { title: "Bookmarks", url: "/bookmarks", icon: Bookmark },
   { title: "Resources", url: "/resources", icon: Library },
+  // { title: "Community", url: "/community", icon: Users2 },
   { title: "Beta Features", url: "/beta", icon: LightbulbIcon },
   { title: "Profile Setup", url: "/profile-setup", icon: User },
 ];

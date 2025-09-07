@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import axios from 'axios';
-import { authMiddleware } from '../config/middleware';
-import supabase from '../config/supabaseClient';
+import { authMiddleware } from '../../config/middleware';
+import supabase from '../../config/supabaseClient';
 
 
 const router = express.Router();
@@ -25,7 +25,7 @@ router.post('/send-message', authMiddleware, async (req: Request, res: Response)
       const titleRes = await axios.post(
         'https://api.groq.com/openai/v1/chat/completions',
         {
-          model: 'llama3-70b-8192',
+          model: "openai/gpt-oss-120b",
           messages: [
             {
               role: 'system',
@@ -35,7 +35,7 @@ router.post('/send-message', authMiddleware, async (req: Request, res: Response)
             { role: 'user', content: message },
           ],
           temperature: 0.7,
-          
+
         },
         {
           headers: {
@@ -52,7 +52,7 @@ router.post('/send-message', authMiddleware, async (req: Request, res: Response)
       const subjectRes = await axios.post(
         'https://api.groq.com/openai/v1/chat/completions',
         {
-          model: 'llama3-70b-8192',
+          model: 'openai/gpt-oss-120b',
           messages: [
             {
               role: 'system',
@@ -112,7 +112,7 @@ router.post('/send-message', authMiddleware, async (req: Request, res: Response)
     // 3. Get full chat history
     const { data: history, error: historyError } = await supabase
       .from('messages')
-      .select('role, content')
+      .select('role, content, resources')
       .eq('chat_id', chatIdToUse)
       .order('created_at', { ascending: true });
 
@@ -131,7 +131,7 @@ router.post('/send-message', authMiddleware, async (req: Request, res: Response)
     const aiResponse = await axios.post(
       'https://api.groq.com/openai/v1/chat/completions',
       {
-        model: 'llama3-70b-8192',
+        model: 'openai/gpt-oss-120b',
         messages: messagesForGroq,
         temperature: 0.7,
       },
@@ -146,11 +146,60 @@ router.post('/send-message', authMiddleware, async (req: Request, res: Response)
     const assistantReply = aiResponse.data.choices?.[0]?.message?.content?.trim()
       || "I'm not sure how to respond to that.";
 
+
+    // === Step 5: Get resource recommendations ===
+    let resources: any[] = [];
+    try {
+      const resourcesRes = await axios.post(
+        'https://api.groq.com/openai/v1/chat/completions',
+        {
+          model: 'openai/gpt-oss-120b',
+          messages: [
+            {
+              role: 'system',
+              content: `You are a strict JSON generator.
+
+Return ONLY a JSON array of recommended learning resources based on the user's question.
+No explanations, no markdown, no text outside JSON. 
+If no resources apply, return: [].
+
+Schema:
+[
+  {
+    "title": "string",        // Short descriptive title
+    "url": "string",          // Full link (https://...)
+    "type": "string",         // "video" | "article" | "book" | "link" | "resource"
+    "description": "string"   // Short explanation of the resource
+  }
+]
+`
+            },
+            {
+              role: 'user',
+              content: `Generate up to 3 resources for this message: ${message}`
+            }
+          ],
+          temperature: 0.2
+        },
+        { headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}` } }
+      );
+
+      let rawResources = resourcesRes.data.choices[0].message?.content || "[]";
+
+      // Clean up accidental code fences
+      rawResources = rawResources.replace(/```json|```/g, "").trim();
+
+      resources = JSON.parse(rawResources);
+    } catch (error) {
+      console.error("Error fetching/parsing resources:", error);
+      resources = [];
+    }
     // 5. Save AI response
     const { error: assistantInsertError } = await supabase.from('messages').insert({
       user_id: userId,
       role: 'assistant',
       content: assistantReply,
+      resources,
       chat_id: chatIdToUse,
     });
 
@@ -162,6 +211,7 @@ router.post('/send-message', authMiddleware, async (req: Request, res: Response)
     res.status(200).json({
       success: true,
       reply: assistantReply,
+      resources,
       chat_id: chatIdToUse,
     });
 
@@ -171,130 +221,4 @@ router.post('/send-message', authMiddleware, async (req: Request, res: Response)
   }
 });
 
-// get a chat ie group of related messages
-router.get("/chat-history/:chatId", authMiddleware, async (req: Request, res: Response) => {
-  const userId = (req as any).user?.userId;
-  const { chatId } = req.params;
-
-  try {
-    // Check if the chat belongs to the user
-    const { data: chat, error: chatError } = await supabase
-      .from('chats')
-      .select('id,title,created_at')
-      .eq('id', chatId)
-      .eq('user_id', userId)
-      .single();
-
-    if (chatError || !chat) {
-      return res.status(403).json({ error: "Chat not found or access denied" });
-    }
-
-    // Fetch full message history for the chat
-    const { data: messages, error: messageError } = await supabase
-      .from('messages')
-      .select('role, content, created_at')
-      .eq('chat_id', chatId)
-      .order('created_at', { ascending: true });
-
-    if (messageError) {
-      console.error("Error fetching messages:", messageError);
-      return res.status(500).json({ error: 'Failed to retrieve messages' });
-    }
-
-    res.status(200).json({
-      success: true,
-      chat_id: chatId,
-      messages,
-    });
-
-  } catch (error) {
-    console.error("Chat history error:", error);
-    res.status(500).json({ error: 'Something went wrong' });
-  }
-});
-
-// get all messages sent 
-router.get("/sent-messages", authMiddleware, async (req: Request, res: Response) => {
-  const userId = (req as any).user?.userId;
-  try {
-    const { data: mssgs, error: MssgsError } = await supabase
-      .from("messages")
-      .select("*", { count: 'exact' })
-      .eq("user_id", userId)
-      .eq("role", "user")
-
-    if (MssgsError) {
-      console.error("Error Fetching messages", MssgsError)
-      return res.status(500).json({ error: "Failed to fetch messages histoty" })
-    }
-    return res.status(200).json({ mssgs })
-
-  } catch (error) {
-    console.error("Error fetching messages:", error);
-    return res.status(500).json({ error: "Failed to fetch messages history" });
-  }
-})
-
-// get all chats 
-router.get("/chats-history", authMiddleware, async (req: Request, res: Response) => {
-  const userId = (req as any).user?.userId;
-
-  try {
-    const { data: chats, error } = await supabase
-      .from("chats")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching chats:", error);
-      return res.status(500).json({ error: "Failed to fetch chat history" });
-    }
-
-    res.status(200).json({ success: true, chats });
-  } catch (error) {
-    console.error("Fetch all chats error:", error);
-    res.status(500).json({ error: "Something went wrong" });
-  }
-});
-
-router.delete( "/delete-chat/:chatId", authMiddleware,  async (req: Request, res: Response) => {
-    const userId = (req as any).user?.userId; // extracted from JWT in authMiddleware
-    const { chatId } = req.params;
-
-    try {
-      // 1. Check if the chat belongs to the user
-      const { data: chat, error: chatError } = await supabase
-        .from("chats")
-        .select("id")
-        .eq("id", chatId)
-        .eq("user_id", userId)
-        .single();
-
-      if (chatError || !chat) {
-        return res
-          .status(403)
-          .json({ error: "Chat not found or access denied" });
-      }
-
-      // 2. Delete the chat
-      const { error: deleteError } = await supabase
-        .from("chats")
-        .delete()
-        .eq("id", chatId)
-        .eq("user_id", userId);
-
-      if (deleteError) {
-        console.error("Delete error:", deleteError);
-        return res.status(500).json({ error: "Failed to delete chat" });
-      }
-
-      return res.status(200).json({ message: "Chat deleted successfully" });
-    } catch (error) {
-      console.error("Chat deletion error:", error);
-      return res.status(500).json({ error: "Something went wrong" });
-    }
-  }
-);
-
-export { router as GroqAI };
+export { router as sendMessage }

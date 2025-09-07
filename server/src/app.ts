@@ -9,14 +9,19 @@ import { RefreshTokenRoute } from './routes/auth/refresh'
 import { LogOutRoute } from './routes/auth/logout'
 import { ProfileRoute } from './routes/userDetailsRoutes/profile'
 import cors from 'cors'
-import { GroqAI } from './Services/groqAPI'
-import youtubeRoutes from './Services/googleAPI'
+import { ChatHistory } from './Services/Groq/chatHistory'
+import youtubeRoutes from './Services/Google/YoutubeAPI'
 import { TrackUserTime } from './routes/userDetailsRoutes/trackTime'
 import { Bookmark } from './routes/userDetailsRoutes/bookmarks'
 import { MeRoute } from './routes/userDetailsRoutes/me'
 import { DeleteRoute } from './routes/auth/delete'
-import { GoogleAuth } from './routes/auth/google'
-
+import { GoogleAuth } from './routes/auth/googleAuth'
+import { Onboarding } from './routes/auth/onboarding';
+import { sendMessage } from './Services/Groq/sendMessage';
+import { DeleteChat } from './Services/Groq/deleteChat';
+import { SentMessages } from './Services/Groq/getMessages';
+import { SingleChat } from './Services/Groq/getSingleChat';
+import { QuizRoutes } from './routes/QuizRoute';
 dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 5050
@@ -25,7 +30,7 @@ const PORT = process.env.PORT || 5050
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-  origin: ["http://localhost:8080","https://acadex-tutor-ai.vercel.app"],
+  origin: ["http://localhost:8080", "https://acadex-tutor-ai.vercel.app", "https://acadex.ai"],
   credentials: true
 }))
 
@@ -76,7 +81,8 @@ app.use("/auth", ForgotPasswordRoute)
 app.use("/auth", RefreshTokenRoute)
 app.use("/auth", LogOutRoute)
 app.use("/auth", DeleteRoute)
-app.use("/auth",GoogleAuth)
+app.use("/auth", Onboarding)
+app.use("/auth", GoogleAuth)
 app.use("/me", MeRoute)
 
 // User Route
@@ -92,8 +98,19 @@ const apiLimiter = rateLimit({
   message: "Too many API requests, please slow down.",
 });
 app.use("/api", apiLimiter);
-app.use("/api", GroqAI);
+
+// Groq Apis
+app.use("/api", ChatHistory);
+app.use("/api", sendMessage)
+app.use("/api", DeleteChat)
+app.use("/api", SentMessages)
+app.use("/api", SingleChat)
+
+// Youtube Api
 app.use("/api/youtube", youtubeRoutes);
+
+// Quiz Routes
+app.use("/quiz", QuizRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello")

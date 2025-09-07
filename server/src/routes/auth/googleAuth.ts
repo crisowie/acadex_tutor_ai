@@ -26,8 +26,8 @@ const GOOGLE_CLIENT_SECRET = process.env.SIGNIN_WITH_GOOGLE_CLIENT_SECRET!;
 
 const cookieOptions = {
   httpOnly: true,
-  secure: true,
-  sameSite: "none" as const,
+  secure: false,
+  sameSite: "lax" as const,
 };
 
 router.get("/login/google", (req: Request, res: Response) => {

@@ -16,11 +16,12 @@ import { useChatHistory } from "@/hooks/useChatHistory";
 import { useMssgHistory } from "@/hooks/useMssgHistory";
 import { useTotalTime } from "@/hooks/useTimeOnline";
 import { useAuth } from "@/context/AuthContext";
-
+import { useQuiz } from "@/context/QuizContext";
 
 export default function Dashboard() {
   const { messages } = useMssgHistory()
   const { user } = useAuth()
+  const { quizzes } = useQuiz()
   const { chatHistory } = useChatHistory()
   const { data, loading, error } = useTotalTime(user?.id || "");
 
@@ -39,7 +40,14 @@ export default function Dashboard() {
     },
     {
       title: "Quiz Score Average",
-      value: "85%",
+      value: quizzes.length > 0
+        ? Math.round(
+          quizzes
+            .filter(q => q.completed && q.score !== null)
+            .reduce((acc, q) => acc + (q.score || 0), 0) /
+          quizzes.filter(q => q.completed && q.score !== null).length || 1
+        )
+        : 0,
       change: "+8%",
       icon: Trophy,
       color: "text-primary",
@@ -60,7 +68,6 @@ export default function Dashboard() {
       color: "text-purple-500",
     },
   ];
-
 
 
   return (
@@ -188,11 +195,11 @@ export default function Dashboard() {
             <div className="p-4 rounded-lg bg-orange-500/5 border border-orange-500/20">
               <div className="flex items-center gap-2 mb-2">
                 <BookOpen className="h-4 w-4 text-orange-500" />
-                <span className="text-sm font-medium">Quiz Target</span>
+                <span className="text-sm font-medium">Quiz Taken</span>
               </div>
-              <p className="text-2xl font-bold text-orange-500">0</p>
-              <p className="text-xs text-muted-foreground">None</p>
-              <Progress value={33} className="mt-2 h-1" />
+              <p className="text-2xl font-bold text-orange-500">{quizzes.length}</p>
+              <p className="text-xs text-muted-foreground">{quizzes.length > 0 ? `${quizzes.length} quizzes taken` : 'No quizzes taken'}</p>
+              <Progress value={quizzes.length > 0 ? quizzes.length * 10 : 0} className="mt-2 h-1" />
             </div>
 
             <div className="p-4 rounded-lg bg-purple-500/5 border border-purple-500/20">

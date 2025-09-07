@@ -38,7 +38,7 @@ export default function Signup() {
 
       if (success) {
         toast.success("Signup successful!");
-        navigate("/dashboard");
+        navigate("/onboarding");
       } else {
         toast.error("Signup failed. Try again.");
       }

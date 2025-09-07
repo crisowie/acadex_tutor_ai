@@ -6,19 +6,50 @@
 All colors MUST be HSL.
 */
 
+
+
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: red;
+}
+
+/* Firefox */
+/* * {
+  scrollbar-width: none;
+} */
+
+/* Chrome, Edge, Safari */
+
+
+/* Firefox */
+
+
+
 @layer base {
   :root {
     /* ChatGPT-like dark theme with green accents */
-    --background: 0 0% 11.8%; /* #1e1e1e */
+    --background: 0 0% 11.8%;
+    /* #1e1e1e */
     --foreground: 0 0% 95%;
 
-    --card: 0 0% 15%; /* slightly lighter than background */
+    --card: 0 0% 15%;
+    /* slightly lighter than background */
     --card-foreground: 0 0% 95%;
 
     --popover: 0 0% 15%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 142 71% 45%; /* green-500 #22c55e */
+    --primary: 142 71% 45%;
+    /* green-500 #22c55e */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 20%;
@@ -27,7 +58,8 @@ All colors MUST be HSL.
     --muted: 0 0% 18%;
     --muted-foreground: 0 0% 65%;
 
-    --accent: 142 71% 45%; /* green accent */
+    --accent: 142 71% 45%;
+    /* green accent */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -35,12 +67,15 @@ All colors MUST be HSL.
 
     --border: 0 0% 25%;
     --input: 0 0% 20%;
-    --ring: 142 71% 45%; /* green focus ring */
+    --ring: 142 71% 45%;
+    /* green focus ring */
 
-    --radius: 0.75rem; /* more rounded for modern look */
+    --radius: 0.75rem;
+    /* more rounded for modern look */
 
     /* Sidebar colors for dark theme */
-    --sidebar-background: 0 0% 9%; /* darker than main background */
+    --sidebar-background: 0 0% 9%;
+    /* darker than main background */
     --sidebar-foreground: 0 0% 90%;
     --sidebar-primary: 142 71% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
@@ -67,10 +102,11 @@ All colors MUST be HSL.
 }
 
 /* scroll.css */
-.scrollbar-hide::-webkit-scrollbar {
+/* .scrollbar-hide::-webkit-scrollbar {
   display: none;
-}
-.scrollbar-hide {
-  -ms-overflow-style: none;  /* IE & Edge */
-  scrollbar-width: none;     /* Firefox */
-}
+} */
+
+/* .scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+} */

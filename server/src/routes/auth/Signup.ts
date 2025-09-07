@@ -69,15 +69,15 @@ router.post("/signup", async (req: Request, res: Response) => {
     // ✅ Set cookies
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      sameSite: "none",
-      secure: true,      
+      sameSite: "lax",
+      secure: false,      
       maxAge: 1000 * 60 * 60
     })
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      sameSite: "none",
-      secure: true,      
+      sameSite: "lax",
+      secure: false,      
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     })
 
