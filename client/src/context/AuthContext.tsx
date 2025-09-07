@@ -5,8 +5,8 @@ import { AuthContextType } from "../types";
 
 // Axios global setup
 axios.defaults.withCredentials = true;
-// axios.defaults.baseURL = "https://acadex-tutor-ai.onrender.com";
-axios.defaults.baseURL ="http://localhost:5050";
+axios.defaults.baseURL = "https://acadex-tutor-ai.onrender.com";
+// axios.defaults.baseURL ="http://localhost:5050";
 // Create Auth Context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
