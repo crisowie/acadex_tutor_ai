@@ -1,5 +1,5 @@
 import React from "react";
-import { ExternalLink, BookOpen, FileText } from "lucide-react";
+import { ExternalLink, BookOpen, FileText,User } from "lucide-react";
 
 type Resource = {
   title: string;

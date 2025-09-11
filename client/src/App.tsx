@@ -21,15 +21,17 @@ import Settings from "./pages/Settings";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import Community from "./pages/Community";
+import AccountPage from "./pages/AccountPage";
 import ResetPassword from "./pages/ResetPassword";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import CompleteProfile from "./pages/completeProfile";
 import { ChatProvider } from "@/context/ChatContext";
 import SessionTracker from "./components/SessionTracker";
-
+import { NotesProvider } from "./context/NoteContext";
 import { WatchPage } from "./pages/WatchPage";
 import OnboardingPage from "./pages/Onboarding";
 import { QuizProvider } from "@/context/QuizContext";
+import Notes from "./pages/Notes";
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -41,163 +43,186 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ChatProvider>
-          <QuizProvider>
-            <TooltipProvider>
-              <ToasterComponent />
-              <SessionTracker />
-              <Toaster />
-              <Sonner />
+          <NotesProvider>
+            <QuizProvider>
+              <TooltipProvider>
+                <ToasterComponent />
+                <SessionTracker />
+                <Toaster />
+                <Sonner />
 
-              {showNavbar && <Navbar />}
+                {showNavbar && <Navbar />}
 
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
+                <Routes>
+                  {/* Public Routes */}
+                  <Route path="/" element={<Home />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/signup" element={<Signup />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
 
-                {/* Protected Routes with Layout */}
-                <Route
-                  path="/dashboard"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Dashboard />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/ask"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <AskQuestion />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/onboarding"
-                  element={
-                    <ProtectedRoute>
-                      <OnboardingPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/chat/:chatId"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <AskQuestion />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/profile-setup"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <CompleteProfile />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/quizzes"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Quizzes />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
+                  {/* Protected Routes with Layout */}
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Dashboard />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
 
                   <Route
-                  path="/quiz/:quizId"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <QuizPage />
-                      </Layout>
-                    </ProtectedRoute>
-                  } />
+                    path="/ask"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <AskQuestion />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/account"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <AccountPage />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/onboarding"
+                    element={
+                      <ProtectedRoute>
+                        <OnboardingPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/chat/:chatId"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <AskQuestion />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/profile-setup"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <CompleteProfile />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
 
-                <Route
-                  path="/bookmarks"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Bookmarks />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
+                  <Route
+                    path="/quizzes"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Quizzes />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
 
-                <Route
-                  path="/community"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Community />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/resources"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Resources />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
+                  <Route
+                    path="/quiz/:quizId"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <QuizPage />
+                        </Layout>
+                      </ProtectedRoute>
+                    } />
 
-                <Route
-                  path="/watch/:videoId"
-                  element={
-                    <ProtectedRoute>
-                      <WatchPage />
-                    </ProtectedRoute>
+                  <Route
+                    path="/bookmarks"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Bookmarks />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
 
-                  }
-                />
-                <Route
-                  path="/beta"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <BetaPage />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
+                  <Route
+                    path="/community"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Community />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/resources"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Resources />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/note"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Notes />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
 
-                <Route
-                  path="/settings"
-                  element={
-                    <ProtectedRoute>
-                      <Layout>
-                        <Settings />
-                      </Layout>
-                    </ProtectedRoute>
-                  }
-                />
+                  <Route
+                    path="/watch/:videoId"
+                    element={
+                      <ProtectedRoute>
+                        <WatchPage />
+                      </ProtectedRoute>
 
-                {/* 404 Not Found */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </TooltipProvider>
-          </QuizProvider>
+                    }
+                  />
+                  <Route
+                    path="/beta"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <BetaPage />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  <Route
+                    path="/settings"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Settings />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  {/* 404 Not Found */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </TooltipProvider>
+            </QuizProvider>
+          </NotesProvider>
+
 
         </ChatProvider>
       </AuthProvider>

@@ -1,5 +1,5 @@
 // src/components/LoadingSpinner.tsx
-import React from 'react';
+import react from 'react';
 
 export const LoadingSpinner1 = () => {
   return (

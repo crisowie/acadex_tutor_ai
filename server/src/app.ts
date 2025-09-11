@@ -9,7 +9,7 @@ import { RefreshTokenRoute } from './routes/auth/refresh'
 import { LogOutRoute } from './routes/auth/logout'
 import { ProfileRoute } from './routes/userDetailsRoutes/profile'
 import cors from 'cors'
-import { ChatHistory } from './Services/Groq/chatHistory'
+import { ChatHistory } from './Services/ChatService/chatHistory'
 import youtubeRoutes from './Services/Google/YoutubeAPI'
 import { TrackUserTime } from './routes/userDetailsRoutes/trackTime'
 import { Bookmark } from './routes/userDetailsRoutes/bookmarks'
@@ -17,11 +17,12 @@ import { MeRoute } from './routes/userDetailsRoutes/me'
 import { DeleteRoute } from './routes/auth/delete'
 import { GoogleAuth } from './routes/auth/googleAuth'
 import { Onboarding } from './routes/auth/onboarding';
-import { sendMessage } from './Services/Groq/sendMessage';
-import { DeleteChat } from './Services/Groq/deleteChat';
-import { SentMessages } from './Services/Groq/getMessages';
-import { SingleChat } from './Services/Groq/getSingleChat';
-import { QuizRoutes } from './routes/QuizRoute';
+import { sendMessage } from './Services/ChatService/sendMessage';
+import { DeleteChat } from './Services/ChatService/deleteChat';
+import { SentMessages } from './Services/ChatService/getMessages';
+import { SingleChat } from './Services/ChatService/getSingleChat';
+import { QuizRoutes } from './Services/QuizService';
+import NotesRoutes from './Services/NoteService';
 dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 5050
@@ -54,20 +55,20 @@ const authLimiter = rateLimit({
 });
 
 // Login route limiter
-const loginLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 15, // max 15 attempts per minute
-  message: "Too many login attempts, please wait.",
-});
+// const loginLimiter = rateLimit({
+//   windowMs: 10 * 60 * 1000, // 10 minutes
+//   max: 30, // max 30 attempts per minute
+//   message: "Too many login attempts, please wait.",
+// });
 
 // Signup route limiter
 const signupLimiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 20, // max 20 signups per IP
+  max: 30, // max 30 signups per IP
   message: "Too many signup attempts, please try later.",
 });
 
-app.use("/auth/login", loginLimiter);
+// app.use("/auth/login", loginLimiter);
 app.use("/auth/signup", signupLimiter);
 
 // Apply general auth limiter only to the rest
@@ -111,6 +112,8 @@ app.use("/api/youtube", youtubeRoutes);
 
 // Quiz Routes
 app.use("/quiz", QuizRoutes);
+
+app.use("/note", NotesRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello")

@@ -28,11 +28,8 @@ export default function Bookmarks() {
 
   const navigate = useNavigate()
 
-
   const { bookmarks, loading, error, removeBookmark, fetchBookmarks } =
     useBookmarks(selectedType ? (selectedType.toLowerCase() as BookmarkType) : undefined);
-
-
 
   useEffect(() => {
     fetchBookmarks();
@@ -42,9 +39,7 @@ export default function Bookmarks() {
     fetchBookmarks()
   }, [])
 
-
   const getBookmarkData = (bookmark: BookmarkUnion) => {
-
     const type = bookmark.type;
     let title = "";
     let subject = "";
@@ -86,9 +81,7 @@ export default function Bookmarks() {
     return { title, subject, content, date, url };
   };
 
-
   const types = ["chat", "question", "video", "resource"];
-
 
   const filteredBookmarks = bookmarks.filter(bookmark => {
     const { title, subject, content } = getBookmarkData(bookmark);
@@ -102,7 +95,6 @@ export default function Bookmarks() {
     return matchesType && matchesSearch;
   });
 
-
   const getTypeColor = (type: string) => {
     switch (type.toLowerCase()) {
       case "question": return "bg-blue-500/10 text-blue-500 border-blue-500/20";
@@ -112,7 +104,6 @@ export default function Bookmarks() {
       default: return "bg-muted text-muted-foreground";
     }
   };
-
 
   const handleRemoveBookmark = async (type: BookmarkType, itemId: string) => {
     try {
@@ -130,187 +121,190 @@ export default function Bookmarks() {
     }
 
     if (url.startsWith("http")) {
-      // External link → open in new tab
       window.open(url, "_blank");
     } else {
-      // Internal route → use React Router
       navigate(url);
     }
   };
 
-
-
-
   return (
-    <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Bookmarks</h1>
-            <p className="text-muted-foreground">
-              Your saved questions, resources, and study materials
-            </p>
+    <div className="w-full min-h-screen">
+      <div className="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="space-y-3 sm:space-y-4">
+          <div className="flex flex-col gap-3 sm:gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Bookmarks</h1>
+                <p className="text-sm sm:text-base text-muted-foreground">
+                  Your saved questions, resources, and study materials
+                </p>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <Bookmark className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                <span className="text-sm font-medium whitespace-nowrap">{bookmarks.length} saved</span>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Bookmark className="h-5 w-5 text-primary" />
-            <span className="text-sm font-medium">{bookmarks.length} saved</span>
+
+          {/* Search and Filters */}
+          <div className="space-y-3 sm:space-y-4">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search bookmarks..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9 w-full"
+              />
+            </div>
+
+            <div className="w-full overflow-x-auto">
+              <div className="flex gap-2 min-w-max pb-1">
+                <Button
+                  variant={selectedType === null ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedType(null)}
+                  className="flex-shrink-0 text-xs sm:text-sm"
+                >
+                  All Types
+                </Button>
+                {types.map((type) => (
+                  <Button
+                    key={type}
+                    variant={selectedType === type ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedType(type)}
+                    className="flex-shrink-0 text-xs sm:text-sm capitalize"
+                  >
+                    {type}
+                  </Button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Search and Filters */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1 min-w-0">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search bookmarks..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 w-full"
-            />
-          </div>
+        {/* Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {types.map((type) => {
+            const count = bookmarks.filter(b => b.type.toLowerCase() === type.toLowerCase()).length;
 
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant={selectedType === null ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedType(null)}
-            >
-              All Types
-            </Button>
-            {types.map((type) => (
-              <Button
-                key={type}
-                variant={selectedType === type ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedType(type)}
-              >
-                {type}
-              </Button>
-            ))}
-          </div>
+            return (
+              <Card key={type} className="min-w-0">
+                <CardContent className="p-3 sm:p-4 text-center">
+                  <p className="text-xl sm:text-2xl font-bold text-foreground">{count}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground capitalize truncate">{type}s</p>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
-      </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        {types.map((type) => {
-          const count = bookmarks.filter(b => b.type.toLowerCase() === type.toLowerCase()).length;
+        {/* Bookmarks List */}
+        <div className="space-y-3 sm:space-y-4">
+          {filteredBookmarks.map((bookmark) => {
+            const { title, subject, content, date, url } = getBookmarkData(bookmark);
 
-          return (
-            <Card key={type}>
-              <CardContent className="p-4 text-center">
-                <p className="text-2xl font-bold text-foreground">{count}</p>
-                <p className="text-sm text-muted-foreground">{type}s</p>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+            const getIcon = (type: string) => {
+              switch (type) {
+                case "question":
+                  return FileText;
+                case "video":
+                  return Video;
+                case "resource":
+                  return Book;
+                case "chat":
+                  return FileText;
+                default:
+                  return Bookmark;
+              }
+            };
 
+            const Icon = getIcon(bookmark.type);
 
+            return (
+              <Card key={bookmark.id} className="hover:shadow-lg transition-all duration-200">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="space-y-3 sm:space-y-0 sm:flex sm:items-start sm:gap-4">
+                    <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0 w-fit">
+                      <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                    </div>
 
-      {/* Bookmarks List */}
-      <div className="space-y-4">
-        {filteredBookmarks.map((bookmark) => {
-          const { title, subject, content, date, url } = getBookmarkData(bookmark);
+                    <div className="flex-1 min-w-0 space-y-3">
+                      <div className="space-y-2">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4">
+                          <div className="space-y-2 flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                              <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-foreground break-words line-clamp-2">
+                                {title}
+                              </h3>
+                              <Badge className={`${getTypeColor(bookmark.type)} text-xs flex-shrink-0`}>
+                                {bookmark.type}
+                              </Badge>
+                            </div>
 
-          const getIcon = (type: string) => {
-            switch (type) {
-              case "question":
-                return FileText;
-              case "video":
-                return Video;
-              case "resource":
-                return Book;
-              case "chat":
-                return FileText;
-              default:
-                return Bookmark;
-            }
-          };
+                            {subject && (
+                              <Badge variant="outline" className="text-xs w-fit">
+                                {subject}
+                              </Badge>
+                            )}
 
-          const Icon = getIcon(bookmark.type);
+                            {content && (
+                              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 break-words">
+                                {content}
+                              </p>
+                            )}
 
-          return (
-            <Card key={bookmark.id} className="hover:shadow-lg transition-all duration-200">
-              <CardContent className="p-4">
-                <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-                  <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0">
-                    <Icon className="h-5 w-5 text-primary" />
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                      <div className="space-y-2 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-base sm:text-lg font-semibold text-foreground truncate">
-                            {title}
-                          </h3>
-                          <Badge className={getTypeColor(bookmark.type)}>
-                            {bookmark.type}
-                          </Badge>
-                          {subject && (
-                            <Badge variant="outline" className="text-xs">
-                              {subject}
-                            </Badge>
-                          )}
-                        </div>
-
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {content}
-                        </p>
-
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>{new Date(date).toLocaleDateString()}</span>
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Calendar className="h-3 w-3 flex-shrink-0" />
+                              <span className="whitespace-nowrap">{new Date(date).toLocaleDateString()}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap flex-shrink-0 w-full sm:w-auto">
+                      <div className="flex flex-col xs:flex-row gap-2 pt-1">
                         <Button
                           size="sm"
-                          className="whitespace-nowrap w-full sm:w-auto"
+                          className="text-xs sm:text-sm"
                           variant="outline"
                           onClick={() => handleOpenBookmark(url)}
                         >
-                          <ExternalLink className="h-4 w-4 mr-1" />
+                          <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5" />
                           Open
                         </Button>
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => handleRemoveBookmark(bookmark.type, bookmark.item_id)}
-                          className="whitespace-nowrap w-full sm:w-auto text-destructive hover:text-destructive"
+                          className="text-xs sm:text-sm text-destructive hover:text-destructive"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5" />
+                          Remove
                         </Button>
                       </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-
-
-      </div>
-
-      {filteredBookmarks.length === 0 && (
-        <div className="text-center py-12">
-          <Bookmark className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-foreground mb-2">No bookmarks found</h3>
-          <p className="text-muted-foreground">
-            {searchTerm || selectedType
-              ? "Try adjusting your search or filter criteria."
-              : "Start bookmarking your favorite questions and resources to see them here."
-            }
-          </p>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
-      )}
+
+        {filteredBookmarks.length === 0 && (
+          <div className="text-center py-8 sm:py-12 px-4">
+            <Bookmark className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground mx-auto mb-3 sm:mb-4" />
+            <h3 className="text-base sm:text-lg font-medium text-foreground mb-2">No bookmarks found</h3>
+            <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto">
+              {searchTerm || selectedType
+                ? "Try adjusting your search or filter criteria."
+                : "Start bookmarking your favorite questions and resources to see them here."
+              }
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

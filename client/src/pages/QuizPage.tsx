@@ -329,7 +329,7 @@ export default function QuizPage() {
           <Button variant="ghost" size="sm" onClick={handleGoBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold">{quiz.topic || quiz.subject || "Quiz"}</h1>
+          <h1 className="text-2xl font-bold">{ quiz.topic.length < 4 ? quiz.topic : quiz.subject || "Quiz"}</h1>
         </div>
         <Badge variant="outline">
           {quiz.subject || quiz.difficulty || "General"}

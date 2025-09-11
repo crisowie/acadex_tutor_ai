@@ -2,7 +2,6 @@ import { createContext, useContext, useState, ReactNode, useCallback, useEffect 
 import axios from "axios";
 import { Quiz, QuizContextType } from "@/types";
 
-
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL =  "https://acadex-tutor-ai.onrender.com";
 // axios.defaults.baseURL = "http://localhost:5050";
@@ -20,7 +19,6 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   const [currentQuiz, setCurrentQuiz] = useState<Quiz | null>(null);
   const [completedQuizzes, setCompletedQuizzes] = useState<Quiz[]>([]);
   const [completedCount, setCompletedCount] = useState<number>(0);
-
   const [loading, setLoading] = useState(false);
   const [userAnswers, setUserAnswers] = useState<Record<string, string | null>>({});
 
@@ -50,7 +48,6 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     setUserAnswers({});
   }, []);
 
-
   // -------------------------------
   // Fetch quiz history
   // -------------------------------
@@ -68,12 +65,14 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-
+  // -------------------------------
+  // Fetch Completed Quiz count
+  // -------------------------------
   const fetchCompletedCount = useCallback(async () => {
     try {
       setLoading(true);
       const res = await axios.get("/quiz/history/completed/count");
-      const { count } = handleApiResponse(res); // ✅ now works
+      const { count } = handleApiResponse(res);
       setCompletedCount(count);
       console.log("Completed quiz count:", count);
     } catch (err) {
@@ -83,7 +82,9 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-
+  // -------------------------------
+  // Fetch Completed Quizzes
+  // -------------------------------
   const fetchCompletedQuizzes = useCallback(async () => {
     try {
       setLoading(true);
@@ -98,9 +99,6 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-
-
-
   // -------------------------------
   // Fetch quiz by ID
   // -------------------------------
@@ -113,7 +111,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
       const res = await axios.get(`/quiz/history/${quizId}`);
       console.log(res)
       const quiz = handleApiResponse(res);
-      setCurrentQuiz(quiz); // ✅ ensure state updates
+      setCurrentQuiz(quiz);
       return quiz;
     } catch (err) {
       console.error("Error fetching quiz by ID", err);
@@ -122,10 +120,6 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     }
   }, [resetCurrentQuiz, resetQuizForRetake]);
-
-
-
-
 
   // -------------------------------
   // Mark quiz as completed
@@ -151,16 +145,14 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [fetchCompletedQuizzes, fetchCompletedCount]);
 
-
   useEffect(() => {
     fetchCompletedQuizzes();
-    fetchCompletedCount(); // ✅ add this
+    fetchCompletedCount();
   }, [fetchCompletedQuizzes, fetchCompletedCount]);
 
-
-  // Get Best Subject
-
-
+  // -------------------------------
+  // Fetch best subject
+  // -------------------------------
   const getBestSubject = () => {
     if (!completedQuizzes || completedQuizzes.length === 0) return "N/A";
 
@@ -171,7 +163,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
       const subject = quiz.topic || quiz.subject || "Unknown";
       if (!subjectScores[subject]) subjectScores[subject] = [];
       subjectScores[subject].push(quiz.score || 0);
-    });
+    },[completedQuizzes]);
 
     // Find subject with highest average score
     let bestSubject = "N/A";
@@ -188,10 +180,11 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     return bestSubject;
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchCompletedCount()
-  },[])
-
+    fetchCompletedQuizzes()
+    fetchQuizHistory()
+  }, [fetchQuizHistory, fetchCompletedCount, fetchCompletedQuizzes, ]);
 
   // -------------------------------
   // Generate quiz from topic
@@ -219,10 +212,10 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     try {
       setLoading(true);
       console.log("📡 generateQuizFromChat ->", chatId);
-      const res = await axios.post(`/quiz/chat/${chatId}`, {}); // YOUR baseURL should be set already
+      const res = await axios.post(`/quiz/chat/${chatId}`, {});
       console.log("📮 backend response:", res.status, res.data);
 
-      const quiz = handleApiResponse(res); // expects { success: true, data: {...} }
+      const quiz = handleApiResponse(res);
       console.log("🧩 normalized quiz:", quiz);
 
       setCurrentQuiz(quiz);
@@ -236,6 +229,38 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [fetchQuizHistory]);
 
+  // -------------------------------
+  // ✅ FIXED: Generate quiz from PDF
+  // -------------------------------
+  const generateQuizFromPDF = useCallback(async (file: File): Promise<Quiz | null> => {
+    try {
+      setLoading(true);
+      const formData = new FormData();
+      formData.append("pdf", file); // ✅ Changed from "file" to "pdf" to match backend
+
+      const res = await axios.post(`/quiz/pdf`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+
+      console.log("📮 PDF backend response:", res.status, res.data);
+      
+      // ✅ Handle the response properly - backend returns { success: true, data: quiz }
+      const quiz = handleApiResponse(res);
+      setCurrentQuiz(quiz);
+      
+      console.log("🧩 Generated PDF quiz:", quiz);
+      
+      await fetchQuizHistory();
+      return quiz;
+    } catch (err: any) {
+      console.error("❌ generateQuizFromPDF error:", err.response?.status, err.response?.data || err.message);
+      throw err; // ✅ Re-throw so the component can handle it
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchQuizHistory]);
 
   // -------------------------------
   // Submit quiz answers
@@ -250,7 +275,6 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
       // refresh quizzes list so `completed` updates
       await fetchQuizHistory();
       return handleApiResponse(res);
-
     } catch (err) {
       console.error("Error submitting quiz answers", err);
       throw err;
@@ -271,11 +295,13 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
       if (res.status === 200) {
         // Remove the deleted quiz from the state
         setQuizzes((prevQuizzes) => prevQuizzes.filter((quiz) => quiz.id !== quizId));
+        await fetchQuizHistory();
+        await fetchCompletedCount();
+        return true;
       }
-      await fetchQuizHistory();
-      await fetchCompletedCount();// refresh list
     } catch (err) {
       console.error("Error deleting quiz:", err);
+      return false;
     }
   };
 
@@ -298,6 +324,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         fetchQuizById,
         generateQuizFromChat,
         generateQuizFromTopic,
+        generateQuizFromPDF, // ✅ Now properly implemented
         fetchQuizHistory,
         submitAnswer,
         markQuizCompleted,
@@ -311,7 +338,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         fetchCompletedCount,
         getBestSubject,
         handleResetQuiz,
-        handleDeleteQuiz
+        handleDeleteQuiz,
       }}
     >
       {children}

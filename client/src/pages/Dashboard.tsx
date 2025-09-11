@@ -199,7 +199,7 @@ export default function Dashboard() {
               </div>
               <p className="text-2xl font-bold text-orange-500">{quizzes.length}</p>
               <p className="text-xs text-muted-foreground">{quizzes.length > 0 ? `${quizzes.length} quizzes taken` : 'No quizzes taken'}</p>
-              <Progress value={quizzes.length > 0 ? quizzes.length * 10 : 0} className="mt-2 h-1" />
+              <Progress value={quizzes.length} className="mt-2 h-1" />
             </div>
 
             <div className="p-4 rounded-lg bg-purple-500/5 border border-purple-500/20">

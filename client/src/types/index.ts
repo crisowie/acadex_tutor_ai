@@ -384,7 +384,27 @@ export interface QuizContextType {
   completedCount: number;
   getBestSubject: () => string | null;
   handleResetQuiz: (quizId: string) => Promise<void>;
-  handleDeleteQuiz: (quizId: string) => Promise<void>;
+  handleDeleteQuiz: (quizId: string) => Promise<boolean>;
+  generateQuizFromPDF: (pdfFile: File, chatId?: string) => Promise<Quiz | null>;
+}
+
+
+// Note details
+export interface Note {
+  id: string;
+  chat_id: string;
+  title: string;
+  content: string;
+  created_at: string;
+}
+
+export interface NotesContextType {
+  notes: Note[];
+  fetchNotes: () => Promise<void>;
+  addNote: (chatId: string, title: string, content: string) => Promise<boolean>;
+  deleteNote: (id: string) => Promise<boolean>;
+  loading: boolean;
+  error: string | null;
 }
 
 

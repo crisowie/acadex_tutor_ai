@@ -7,7 +7,7 @@ import supabase from '../../config/supabaseClient';
 const router = express.Router();
 
 // send a message
-router.post('/send-message', authMiddleware, async (req: Request, res: Response) => {
+router.post('/', authMiddleware, async (req: Request, res: Response) => {
   const { message, chat_id } = req.body;
   const userId = (req as any).user?.userId;
 

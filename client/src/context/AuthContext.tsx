@@ -133,7 +133,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const { data } = await axios.post("/auth/signin", { email, password });
       setUser(data.user);
       await fetchUser(); // Fetch user after login
-      return true;
     } catch (err: any) {
       console.error("Login Error:", err.response?.data?.error || err.message);
       return false;
