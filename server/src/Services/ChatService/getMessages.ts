@@ -6,7 +6,7 @@ import supabase from '../../config/supabaseClient';
 const router = express.Router();
 
 // get all messages sent 
-router.get("/sent-messages", authMiddleware, async (req: Request, res: Response) => {
+router.get("/", authMiddleware, async (req: Request, res: Response) => {
   const userId = (req as any).user?.userId;
   try {
     const { data: mssgs, error: MssgsError } = await supabase

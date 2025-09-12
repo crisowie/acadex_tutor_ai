@@ -7,7 +7,7 @@ import supabase from '../../config/supabaseClient';
 const router = express.Router();
 
 // get all chats 
-router.get("/chats-history", authMiddleware, async (req: Request, res: Response) => {
+router.get("/", authMiddleware, async (req: Request, res: Response) => {
   const userId = (req as any).user?.userId;
 
   try {

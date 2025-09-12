@@ -7,7 +7,7 @@ import supabase from '../../config/supabaseClient';
 const router = express.Router();
 
 
-router.delete("/delete-chat/:chatId", authMiddleware, async (req: Request, res: Response) => {
+router.delete("/:chatId", authMiddleware, async (req: Request, res: Response) => {
   const userId = (req as any).user?.userId; // extracted from JWT in authMiddleware
   const { chatId } = req.params;
 

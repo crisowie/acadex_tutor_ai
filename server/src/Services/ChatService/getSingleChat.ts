@@ -8,7 +8,7 @@ const router = express.Router();
 
 
 
-router.get("/chat-history/:chatId", authMiddleware, async (req: Request, res: Response) => {
+router.get("/:chatId", authMiddleware, async (req: Request, res: Response) => {
   const userId = (req as any).user?.userId;
   const { chatId } = req.params;
 

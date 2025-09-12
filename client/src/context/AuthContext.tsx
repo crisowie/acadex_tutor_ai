@@ -61,10 +61,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const { data } = await axios.get("/user/profile");
       setUser(data.user);
-      console.log(data.user)
+      console.log("Fetched user:", data.user);
+      return data.user;
     } catch (err) {
       console.error("🚫 Fetch user failed:", err);
       setUser(null);
+      return null;
     }
   };
 
@@ -132,7 +134,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const { data } = await axios.post("/auth/signin", { email, password });
       setUser(data.user);
-      await fetchUser(); // Fetch user after login
+      await fetchUser(); 
+      return true;
     } catch (err: any) {
       console.error("Login Error:", err.response?.data?.error || err.message);
       return false;

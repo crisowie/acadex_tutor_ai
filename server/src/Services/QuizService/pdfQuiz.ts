@@ -340,6 +340,7 @@ router.post("/", authMiddleware, upload.single("pdf"), async (req: Request, res:
 });
 
 /**
+ * "openai/gpt-oss-120b",
  * Extract text content from PDF buffer - Ultra-conservative for large files
  */
 async function extractPdfText(pdfBuffer: Buffer): Promise<string> {

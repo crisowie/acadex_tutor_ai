@@ -23,6 +23,7 @@ import { SentMessages } from './Services/ChatService/getMessages';
 import { SingleChat } from './Services/ChatService/getSingleChat';
 import { QuizRoutes } from './Services/QuizService';
 import NotesRoutes from './Services/NoteService';
+import Chat from './Services/ChatService/index'
 dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 5050
@@ -47,8 +48,8 @@ const globalLimiter = rateLimit({
 app.use(globalLimiter);
 // Rate limit for auth routes
 const authLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 min window
-  max: 5, // each IP gets 5 requests per window
+  windowMs: 60 * 1000 * 10, // 1 min window
+  max: 50, // each IP gets 5 requests per window
   message: "Too many requests, try again later.",
   standardHeaders: true,
   legacyHeaders: false,
@@ -100,12 +101,13 @@ const apiLimiter = rateLimit({
 });
 app.use("/api", apiLimiter);
 
-// Groq Apis
-app.use("/api", ChatHistory);
-app.use("/api", sendMessage)
-app.use("/api", DeleteChat)
-app.use("/api", SentMessages)
-app.use("/api", SingleChat)
+// // Groq Apis
+// app.use("/api", ChatHistory);
+// app.use("/api", sendMessage)
+// app.use("/api", DeleteChat)
+// app.use("/api", SentMessages)
+// app.use("/api", SingleChat)
+app.use("/api", Chat)
 
 // Youtube Api
 app.use("/api/youtube", youtubeRoutes);

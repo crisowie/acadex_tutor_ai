@@ -13,29 +13,28 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login,fetchUser,user } = useAuth(); // ✅ use real login function from context
+  const { login, fetchUser, user } = useAuth(); // ✅ use real login function from context
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (!email || !password) {
       return toast.error("Please enter both email and password.");
     }
-  
+
     try {
       setIsLoading(true);
       const success = await login(email, password);
       if (success) {
-        await fetchUser(); // 🔥 make sure user object is fresh
+        await fetchUser();
         toast.success("Login successful")
-        // 🚀 redirect based on onboarding status
         if (!user?.learning_goal || !user?.skill_level) {
-          navigate("/onboarding"); // 🚀 user must complete onboarding
+          navigate("/onboarding");
         } else {
-          navigate("/ask"); // ✅ send to app
+          navigate("/ask");
         }
-        
+
       } else {
         toast.error("Invalid credentials. Try again.");
       }
@@ -45,7 +44,7 @@ export default function Login() {
       setIsLoading(false);
     }
   };
-  
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 pt-20">
@@ -76,7 +75,7 @@ export default function Login() {
               <Input
                 id="password"
                 type="password"
-                disabled={isLoading ? true : false} 
+                disabled={isLoading ? true : false}
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -104,10 +103,10 @@ export default function Login() {
               <hr className="flex-grow border-muted" />
             </div>
 
-      
+
           </form>
           <div className="pt-4">
-          <GoogleSignInButton />
+            <GoogleSignInButton />
           </div>
 
           <div className="mt-6 text-center">
