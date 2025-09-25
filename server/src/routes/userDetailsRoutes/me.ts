@@ -1,11 +1,11 @@
 // routes/auth/me.ts
-import express from 'express'
+import express, { Request, Response } from 'express'
 import { authMiddleware } from '../../config/middleware'
 import supabase from '../../config/supabaseClient'
 
 const router = express.Router()
 
-router.get("/me", authMiddleware, async (req, res) => {
+router.get("/me", authMiddleware, async (req: Request, res: Response) => {
   const userId = (req as any).user?.userId
 
   const { data: profile, error } = await supabase
@@ -18,7 +18,7 @@ router.get("/me", authMiddleware, async (req, res) => {
     return res.status(404).json({ message: "User not found" })
   }
 
-  
+
   return res.status(200).json({
     user: {
       id: profile.id,

@@ -1,5 +1,5 @@
 // routes/youtube.ts
-import express from "express";
+import express,{Request,Response} from "express";
 import axios from "axios";
 import { authMiddleware } from "../../config/middleware";
 
@@ -27,7 +27,7 @@ function logAxiosError(tag: string, err: unknown) {
 }
 
 // GET /api/youtube/search?query=...
-router.get("/search", authMiddleware, async (req, res) => {
+router.get("/search", authMiddleware, async (req: Request, res: Response) => {
   try {
     const q = typeof req.query.query === "string" ? req.query.query.trim() : "";
     if (!q) {

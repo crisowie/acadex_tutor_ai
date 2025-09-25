@@ -1,4 +1,4 @@
-import express from 'express';
+import express from 'express'
 import SingleBookmark from './getSingleBookmarks'
 import AddBookmark from './addBookmark'
 import GetTypeBookmarks from './getTypeBokmarks';

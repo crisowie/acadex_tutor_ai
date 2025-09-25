@@ -1,8 +1,8 @@
-import express, { Request, Response } from 'express'
+import express, { Request, Response } from 'express';
 import { authMiddleware } from '../../config/middleware'
 import supabase from '../../config/supabaseClient'
 
-const router = express.Router()
+const router = express.Router();
 
 // POST /user/bookmarks
 router.post('/', authMiddleware, async (req: Request, res: Response) => {
