@@ -10,7 +10,7 @@ const router = express.Router()
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!
 
-router.post("/signup", async (req: Request, res: Response) => {
+router.post("/", async (req: Request, res: Response) => {
   const { fullName, email, password } = req.body as Auth
 
   if (!fullName || !email || !password) {
@@ -21,14 +21,14 @@ router.post("/signup", async (req: Request, res: Response) => {
     .select("email")
     .eq("email", email)
 
-    if (existError) {
-      return res.status(500).json({ error: "Database error", message: existError.message });
-    }
-    
-    if (existingUsers.length > 0) {
-      return res.status(400).json({ error: "User already exists" });
-    }
-    
+  if (existError) {
+    return res.status(500).json({ error: "Database error", message: existError.message });
+  }
+
+  if (existingUsers.length > 0) {
+    return res.status(400).json({ error: "User already exists" });
+  }
+
   try {
     // ✅ Create Supabase auth user
     const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -67,17 +67,18 @@ router.post("/signup", async (req: Request, res: Response) => {
     )
 
     // ✅ Set cookies
+    const isProd = process.env.NODE_ENV === "production";
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      sameSite: "none",
-      secure: true,      
+      sameSite: isProd ? "none" : "lax",
+      secure: isProd,
       maxAge: 1000 * 60 * 60
     })
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       sameSite: "none",
-      secure: true,      
+      secure: true,
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     })
 

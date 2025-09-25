@@ -73,7 +73,7 @@ export const useBookmarks = (type?: BookmarkType) => {
     setError(null);
 
     try {
-      const res = await axios.get("/user/bookmarks", {
+      const res = await axios.get("/bookmark/all", {
         params: type ? { type } : {},
       });
       console.log(res)
@@ -102,7 +102,7 @@ export const useBookmarks = (type?: BookmarkType) => {
   const checkIfBookmarked = useCallback(
     async (type: BookmarkType, itemId: string): Promise<boolean> => {
       try {
-        const res = await axios.get(`/user/bookmarks/${type}/${itemId}`);
+        const res = await axios.get(`/bookmark/${type}/${itemId}`);
         return res?.data?.bookmarked ?? false;
       } catch (err) {
         console.error("Error checking bookmark:", err);
@@ -116,7 +116,7 @@ export const useBookmarks = (type?: BookmarkType) => {
   const addBookmark = useCallback(
     async (type: BookmarkType, itemId: string) => {
       try {
-        const res = await axios.post("/user/bookmarks", {
+        const res = await axios.post("/bookmark/add", {
           type,
           item_id: itemId,
         });
@@ -136,7 +136,7 @@ export const useBookmarks = (type?: BookmarkType) => {
   const removeBookmark = useCallback(
     async (type: BookmarkType, itemId: string) => {
       try {
-        await axios.delete(`/user/bookmarks/${type}/${itemId}`);
+        await axios.delete(`/bookmark/${type}/${itemId}`);
         fetchBookmarks(); // Refresh the bookmarks list
       } catch (err: any) {
         console.error("Error removing bookmark:", err.message);

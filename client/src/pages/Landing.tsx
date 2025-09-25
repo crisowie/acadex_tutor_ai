@@ -109,9 +109,12 @@ export default function Home() {
                     </button>
                     <ul className="text-left text-xs mb-6 space-y-2">
                       <p className="pb-4 text-sm">What's Included</p>
-                      <li>✔️ Ask up to 5 questions/day</li>
-                      <li>✔️ 50 questions per month</li>
+                      <li>✔️ Ask up to 20 questions/day</li>
+                      <li>✔️ 200 questions per month</li>
+                      <li>✔️ Access to the community</li>
                       <li>✔️ Research Mode</li>
+                      <li>✔️ Convert PDF resources to quiz</li>
+                      <li>✔️ 10 quiz Generator for a week</li>
                       <li>✔️ 2 AI models</li>
                     </ul>
                   </div>
@@ -129,8 +132,8 @@ export default function Home() {
                     <ul className="text-left text-xs mb-6 space-y-2">
                       <p className="pb-4 text-sm">What's Included</p>
                       <li>✔️ All features in Starter</li>
-                      <li>✔️ Ask up to 10 questions/day</li>
-                      <li>✔️ 100 questions per month</li>
+                      <li>✔️ Ask up to 50 questions/day</li>
+                      <li>✔️ 200 questions per month</li>
                       <li>✔️ Research Mode</li>
                       <li>✔️ 4 AI models</li>
                       <li>✔️ Unlimited questions</li>
@@ -152,7 +155,6 @@ export default function Home() {
                       <li>✔️ AI tutor for live support</li>
                       <li>✔️ Priority email support</li>
                       <li>✔️ Personal reading tips</li>
-                      <li>✔️ Community group access</li>
                       <li>✔️ Beta features access</li>
                       <li>✔️ Feature suggestions</li>
                       <li>✔️ Audio to question</li>
@@ -186,7 +188,7 @@ export default function Home() {
 
       </div>
 
-      <div className="py-10 pb-20 px-2" >
+      <div className="py-10 pb-20 px-2 bg-[url(/favicon.ico)] "  >
         <div className="bg-[url('/apply-bg.jpg')] bg-cover bg-center bg-no-repeat rounded-2xl px-4 text-center">
           <h1 className="text-center py-8 text-4xl">Your voice. AI speed</h1>
           <p className="text-center text-xl max-w-3xl mx-auto">

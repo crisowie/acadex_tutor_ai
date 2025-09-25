@@ -87,7 +87,7 @@ export interface Chat {
 export interface ChatContextType {
   messages: Message[];
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
-  sendMessage: (msg: string) => Promise<{ aiReply: string; resources: any[] } | string>;
+  sendMessage: (msg: string) => Promise<{ aiReply: string; resources: any[]; chat_id: string | null } | string>;
   loading: boolean;
   chatId: string | null;
   loadChatHistory: (chatId: string) => Promise<void>;
@@ -95,6 +95,7 @@ export interface ChatContextType {
   chats: Chat[];
   setChat: React.Dispatch<React.SetStateAction<Chat[]>>;
   fetchSingleChat: (id: string) => Promise<void>;
+  summarizePDF:(pdfFile: File, chat_id: string) => Promise<{ chat_id: string | null; aiReply: string; resources: any[] } | null>;
 }
 
 

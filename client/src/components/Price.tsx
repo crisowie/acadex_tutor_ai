@@ -33,6 +33,7 @@ const prices = [
       "50 posts per month",
       "Post editing",
       "Hook generation",
+      "1 Quiz per week",
       "2 AI models",
     ],
   },

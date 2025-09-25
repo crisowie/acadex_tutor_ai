@@ -8,7 +8,7 @@ const router = express.Router();
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
 
-router.post('/refresh-token', (req: Request, res: Response) => {
+router.post('/', (req: Request, res: Response) => {
   const token = req.cookies.refreshToken
   if (!token) {
     return res.status(401).json({ error: 'Refresh token not found' });
@@ -24,10 +24,11 @@ router.post('/refresh-token', (req: Request, res: Response) => {
       ACCESS_TOKEN_SECRET,
       { expiresIn: '1h' } // Short-lived
     );
+    const isProd = process.env.NODE_ENV === "production";
     res.cookie('accessToken', newAccessToken, {
       httpOnly: true,
-      secure: true, // set to true in production with HTTPS
-      sameSite: 'none',
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
       maxAge: 1000 * 60 * 60,
     });
 

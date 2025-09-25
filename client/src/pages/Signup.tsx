@@ -5,15 +5,15 @@ import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import toast from "react-hot-toast";
 import GoogleSignInButton from "../components/GoogleButton";
-
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [fullName, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false);
   const { signup } = useAuth();
   const navigate = useNavigate();
@@ -49,6 +49,10 @@ export default function Signup() {
       setIsLoading(false);
     }
   };
+
+  const handleGoogleSignUp = async () =>{
+    GoogleSignInButton()
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 pt-20">
@@ -92,17 +96,26 @@ export default function Signup() {
 
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                name="password"
-                disabled={isLoading ? true : false}
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="bg-input border-border"
-                required
-              />
+              <div className="flex  items-center relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  disabled={isLoading ? true : false}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="bg-input border-border"
+                />
+                <button
+                  type="button"
+                  className={`absolute inset-y-0 right-0 pr-3 flex items-center ${'text-gray-500 '}`}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                </button>
+              </div>
+
             </div>
 
             <Button
@@ -120,9 +133,9 @@ export default function Signup() {
             </div>
           </form>
           <div className="pt-3">
-          <GoogleSignInButton />
+            { <GoogleSignInButton />}
           </div>
-       
+
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">

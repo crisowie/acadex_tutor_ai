@@ -1,5 +1,5 @@
 import React from "react";
-import { ExternalLink, BookOpen, FileText,User } from "lucide-react";
+import { ExternalLink, BookOpen, FileText } from "lucide-react";
 
 type Resource = {
   title: string;
@@ -13,7 +13,20 @@ type MessageRendererProps = {
 };
 
 export default function MessageRenderer({ content, resources }: MessageRendererProps) {
+  // Debug logging
+  console.log('MessageRenderer received:', { 
+    contentType: typeof content, 
+    contentLength: content?.length || 0,
+    content: content?.substring(0, 100) || 'undefined/null',
+    hasResources: !!resources?.length 
+  });
+
   const renderContent = (text: string) => {
+    // Add safety check for undefined/null text
+    if (!text || typeof text !== 'string') {
+      return [<p key="empty" className="text-gray-400 italic">No content available</p>];
+    }
+
     const lines = text.split('\n');
     const elements: JSX.Element[] = [];
     let currentListItems: string[] = [];
@@ -231,6 +244,11 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
   };
 
   const renderInlineFormatting = (text: string): React.ReactNode => {
+    // Add safety check for undefined/null text
+    if (!text || typeof text !== 'string') {
+      return '';
+    }
+
     // Handle bold, italic, code, and links
     const parts = [];
     let currentText = text;
@@ -345,9 +363,18 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
     );
   };
 
+  // Add safety check for the main content prop
+  if (!content && (!resources || resources.length === 0)) {
+    return (
+      <div className="text-gray-400 italic">
+        No content to display
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-1">
-      {renderContent(content)}
+      {content && renderContent(content)}
       
       {/* Resources Section */}
       {resources && resources.length > 0 && (

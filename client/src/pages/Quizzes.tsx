@@ -216,8 +216,8 @@ export default function Quizzes() {
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-500";
-    if (score >= 0) return "text-orange-500";
-    return "text-red-500";
+    if (score >= 50 && score > 0) return "text-orange-500";
+    if(score < 50) return "text-red-700";
   };
 
   const bestScore = quizzes.length > 0

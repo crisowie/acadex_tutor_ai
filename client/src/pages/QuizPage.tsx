@@ -12,7 +12,7 @@ export default function QuizPage() {
   const { quizId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { submitAnswer, fetchQuizById, handleResetQuiz,fetchQuizHistory,fetchCompletedCount } = useQuiz();
+  const { submitAnswer, fetchQuizById, handleResetQuiz, fetchQuizHistory, fetchCompletedCount } = useQuiz();
   const originalQuizRef = useRef<any>(location.state?.quiz ?? null);
   const [attemptId, setAttemptId] = useState(0);
   const quizFromState = location.state?.quiz;
@@ -216,8 +216,8 @@ export default function QuizPage() {
       setResult(finalResult);
 
       // Refresh quiz history to reflect completion status
-     await fetchQuizHistory();
-     await fetchCompletedCount();
+      await fetchQuizHistory();
+      await fetchCompletedCount();
 
     } catch (error) {
       console.error("Error submitting quiz:", error);
@@ -329,7 +329,7 @@ export default function QuizPage() {
           <Button variant="ghost" size="sm" onClick={handleGoBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold">{ quiz.topic.length < 4 ? quiz.topic : quiz.subject || "Quiz"}</h1>
+
         </div>
         <Badge variant="outline">
           {quiz.subject || quiz.difficulty || "General"}
@@ -348,118 +348,129 @@ export default function QuizPage() {
       )}
 
       {finished ? (
-        /* Quiz Results */
-        <Card className="shadow-lg border-2 border-primary/20">
-          <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
-              {result?.percentage >= 70 ? (
-                <CheckCircle className="h-16 w-16 text-green-500" />
-              ) : result?.percentage >= 50 ? (
-                <CheckCircle className="h-16 w-16 text-orange-500" />
-              ) : (
-                <XCircle className="h-16 w-16 text-red-500" />
-              )}
+        submitting || !result ? (
+          // Show loading while result is being processed
+          <div className="max-w-3xl mx-auto p-6">
+            <div className="text-center py-12">
+              {/* You can swap Loader2 with your custom <LoadingSpinner /> */}
+              <Loader2 className="animate-spin mx-auto h-10 w-10 text-primary mb-4" />
+              <p className="text-muted-foreground">Calculating your results...</p>
             </div>
-            <CardTitle className="text-3xl font-bold">Quiz Complete!</CardTitle>
-          </CardHeader>
-
-          <CardContent className="space-y-6">
-            {/* Score Display */}
-            <div className="text-center space-y-2">
-              <p className="text-2xl font-semibold">
-                {result?.score || 0} / {quiz.questions.length}
-              </p>
-              <p className="text-lg text-muted-foreground">
-                {result?.percentage || 0}% Correct
-              </p>
-            </div>
-
-            {/* Progress Bar */}
-            <Progress
-              value={result?.percentage || 0}
-              className="h-4"
-            />
-
-            {/* Performance Message */}
-            <div className="text-center p-4 rounded-lg bg-muted">
-              <p className="font-medium">
-                {result?.percentage >= 90 ? "Excellent work! 🎉" :
-                  result?.percentage >= 80 ? "Great job! 👏" :
-                    result?.percentage >= 70 ? "Good effort! 👍" :
-                      result?.percentage >= 50 ? "Not bad, keep practicing! 📚" :
-                        "Keep studying and try again! 💪"}
-              </p>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button
-                onClick={handleRetake}
-                className="flex-1 sm:flex-none"
-                variant="default"
-              >
-                Retake Quiz
-              </Button>
-              <Button
-                onClick={handleGoBack}
-                className="flex-1 sm:flex-none"
-                variant="outline"
-              >
-                Back to Quizzes
-              </Button>
-            </div>
-
-            {/* Detailed Results */}
-            {result?.results && result.results.length > 0 && (
-              <div className="mt-6 space-y-3">
-                <h3 className="font-semibold text-lg">Detailed Results</h3>
-                <div className="space-y-4 max-h-96 overflow-y-auto">
-                  {result.results.map((r: any) => {
-                    // find matching question from quiz by id, then by index fallback
-                    const questionData =
-                      quiz.questions.find((q: any) => q.id === r.questionId) ||
-                      (typeof r.questionIndex === "number" ? quiz.questions[r.questionIndex] : undefined) ||
-                      { options: [], question: r.question, correct_answer: r.correct };
-
-                    return (
-                      <div key={r.questionId || r.questionIndex || Math.random()} className="p-4 rounded-lg border bg-gray-200">
-                        <p className="font-medium text-green-600 text-sm mb-3">
-                          {questionData.question ? `Q: ${questionData.question}` : `Question`}
-                        </p>
-
-                        <div className="space-y-2">
-                          {(questionData.options || []).map((opt: string, i: number) => {
-                            const isCorrect = normalize(opt) === normalize(questionData.correct_answer); // ✅ Use correct_answer
-                            const isSelected = normalize(opt) === normalize(r.selected);
-
-                            let optClasses = "w-full text-left p-2 rounded-md border transition";
-                            if (isCorrect) {
-                              optClasses += " bg-green-100 border-green-400 text-green-700";
-                            } else if (isSelected && !isCorrect) {
-                              optClasses += " bg-red-100 border-red-400 text-red-700";
-                            } else {
-                              optClasses += " bg-white border-gray-200 text-gray-700";
-                            }
-
-                            return (
-                              <div key={i} className={optClasses}>
-                                <span className="font-medium mr-2">{String.fromCharCode(65 + i)}.</span>
-                                {opt}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+          </div>
+        ) : (
+          /* Quiz Results */
+          <Card className="shadow-lg border-2 border-primary/20">
+            <CardHeader className="text-center">
+              <div className="flex justify-center mb-4">
+                {result?.percentage >= 70 ? (
+                  <CheckCircle className="h-16 w-16 text-green-500" />
+                ) : result?.percentage >= 50 ? (
+                  <CheckCircle className="h-16 w-16 text-orange-500" />
+                ) : (
+                  <XCircle className="h-16 w-16 text-red-500" />
+                )}
               </div>
-            )}
-          </CardContent>
-        </Card>
-      ) : (
-        /* Active Question */
-        <Card className="shadow-lg">
+              <CardTitle className="text-3xl font-bold">Quiz Complete!</CardTitle>
+            </CardHeader>
+
+            <CardContent className="space-y-6">
+              {/* Score Display */}
+              <div className="text-center space-y-2">
+                <p className="text-2xl font-semibold">
+                  {result?.score || 0} / {quiz.questions.length}
+                </p>
+                <p className="text-lg text-muted-foreground">
+                  {result?.percentage || 0}% Correct
+                </p>
+              </div>
+
+              {/* Progress Bar */}
+              <Progress
+                value={result?.percentage || 0}
+                className="h-4"
+              />
+
+              {/* Performance Message */}
+              <div className="text-center p-4 rounded-lg bg-muted">
+                <p className="font-medium">
+                  {result?.percentage >= 90 ? "Excellent work! 🎉" :
+                    result?.percentage >= 80 ? "Great job! 👏" :
+                      result?.percentage >= 70 ? "Good effort! 👍" :
+                        result?.percentage >= 50 ? "Not bad, keep practicing! 📚" :
+                          "Keep studying and try again! 💪"}
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button
+                  onClick={handleRetake}
+                  className="flex-1 sm:flex-none"
+                  variant="default"
+                >
+                  Retake Quiz
+                </Button>
+                <Button
+                  onClick={handleGoBack}
+                  className="flex-1 sm:flex-none"
+                  variant="outline"
+                >
+                  Back to Quizzes
+                </Button>
+              </div>
+
+              {/* Detailed Results */}
+              {result?.results && result.results.length > 0 && (
+                <div className="mt-6 space-y-3">
+                  <h3 className="font-semibold text-lg">Detailed Results</h3>
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {result.results.map((r: any) => {
+                      // find matching question from quiz by id, then by index fallback
+                      const questionData =
+                        quiz.questions.find((q: any) => q.id === r.questionId) ||
+                        (typeof r.questionIndex === "number" ? quiz.questions[r.questionIndex] : undefined) ||
+                        { options: [], question: r.question, correct_answer: r.correct };
+
+                      return (
+                        <div key={r.questionId || r.questionIndex || Math.random()} className="p-4 rounded-lg border bg-gray-200">
+                          <p className="font-medium text-green-600 text-sm mb-3">
+                            {questionData.question ? `Q: ${questionData.question}` : `Question`}
+                          </p>
+
+                          <div className="space-y-2">
+                            {(questionData.options || []).map((opt: string, i: number) => {
+                              const isCorrect = normalize(opt) === normalize(questionData.correct_answer); // ✅ Use correct_answer
+                              const isSelected = normalize(opt) === normalize(r.selected);
+
+                              let optClasses = "w-full text-left p-2 rounded-md border transition";
+                              if (isCorrect) {
+                                optClasses += " bg-green-100 border-green-400 text-green-700";
+                              } else if (isSelected && !isCorrect) {
+                                optClasses += " bg-red-100 border-red-400 text-red-700";
+                              } else {
+                                optClasses += " bg-white border-gray-200 text-gray-700";
+                              }
+
+                              return (
+                                <div key={i} className={optClasses}>
+                                  <span className="font-medium mr-2">{String.fromCharCode(65 + i)}.</span>
+                                  {opt}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                )}
+              </CardContent>
+            </Card>
+          )
+        ) : (
+          /* Active Question */
+          <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="text-xl">
               {currentQuestionData?.question}
@@ -546,4 +557,4 @@ export default function QuizPage() {
       )}
     </div>
   );
-} 
+}

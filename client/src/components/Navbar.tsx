@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react"
 import { useAuth } from "@/context/AuthContext"
-import { Menu, X } from "lucide-react"
+import { Menu, X, } from "lucide-react"
 
 const Navbar = () => {
   const [menu, setMenu] = useState(false)

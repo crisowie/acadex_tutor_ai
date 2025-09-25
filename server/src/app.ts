@@ -1,29 +1,18 @@
-import express, { Request, Response } from 'express'
-import cookieParser from 'cookie-parser'
-import dotenv from 'dotenv'
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import express, { Request, Response } from 'express';
 import rateLimit from "express-rate-limit";
-import { LoginRoute } from './routes/auth/login'
-import { SignupRoute } from './routes/auth/Signup'
-import { ForgotPasswordRoute } from './routes/auth/forgotPassword'
-import { RefreshTokenRoute } from './routes/auth/refresh'
-import { LogOutRoute } from './routes/auth/logout'
-import { ProfileRoute } from './routes/userDetailsRoutes/profile'
-import cors from 'cors'
-import { ChatHistory } from './Services/ChatService/chatHistory'
-import youtubeRoutes from './Services/Google/YoutubeAPI'
-import { TrackUserTime } from './routes/userDetailsRoutes/trackTime'
-import { Bookmark } from './routes/userDetailsRoutes/bookmarks'
-import { MeRoute } from './routes/userDetailsRoutes/me'
-import { DeleteRoute } from './routes/auth/delete'
-import { GoogleAuth } from './routes/auth/googleAuth'
-import { Onboarding } from './routes/auth/onboarding';
-import { sendMessage } from './Services/ChatService/sendMessage';
-import { DeleteChat } from './Services/ChatService/deleteChat';
-import { SentMessages } from './Services/ChatService/getMessages';
-import { SingleChat } from './Services/ChatService/getSingleChat';
-import { QuizRoutes } from './Services/QuizService';
+import { GoogleAuth } from './routes/auth/googleAuth';
+import AuthRoutes from './routes/auth/index';
+import BookmarkRoutes from './Services/BookmarkService/index'
+import { MeRoute } from './routes/userDetailsRoutes/me';
+import { ProfileRoute } from './routes/userDetailsRoutes/profile';
+import { TrackUserTime } from './routes/userDetailsRoutes/trackTime';
+import Chat from './Services/ChatService/index';
+import youtubeRoutes from './Services/Google/YoutubeAPI';
 import NotesRoutes from './Services/NoteService';
-import Chat from './Services/ChatService/index'
+import { QuizRoutes } from './Services/QuizService';
 dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 5050
@@ -55,12 +44,6 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Login route limiter
-// const loginLimiter = rateLimit({
-//   windowMs: 10 * 60 * 1000, // 10 minutes
-//   max: 30, // max 30 attempts per minute
-//   message: "Too many login attempts, please wait.",
-// });
 
 // Signup route limiter
 const signupLimiter = rateLimit({
@@ -77,20 +60,16 @@ app.use(
   ["/auth/forgot-password", "/auth/refresh", "/auth/logout", "/auth/delete", "/auth/google"],
   authLimiter
 );
-app.use("/auth", SignupRoute)
-app.use("/auth", LoginRoute)
-app.use("/auth", ForgotPasswordRoute)
-app.use("/auth", RefreshTokenRoute)
-app.use("/auth", LogOutRoute)
-app.use("/auth", DeleteRoute)
-app.use("/auth", Onboarding)
+
 app.use("/auth", GoogleAuth)
 app.use("/me", MeRoute)
+app.use("/auth", AuthRoutes)
 
 // User Route
 app.use("/user", ProfileRoute)
 app.use("/user", TrackUserTime)
-app.use("/user", Bookmark)
+
+app.use("/bookmark", BookmarkRoutes)
 
 
 // OpenAI API Route
@@ -100,13 +79,6 @@ const apiLimiter = rateLimit({
   message: "Too many API requests, please slow down.",
 });
 app.use("/api", apiLimiter);
-
-// // Groq Apis
-// app.use("/api", ChatHistory);
-// app.use("/api", sendMessage)
-// app.use("/api", DeleteChat)
-// app.use("/api", SentMessages)
-// app.use("/api", SingleChat)
 app.use("/api", Chat)
 
 // Youtube Api

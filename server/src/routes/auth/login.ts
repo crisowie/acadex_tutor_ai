@@ -10,7 +10,7 @@ const router = express.Router();
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
 
-router.post("/signin", async (req: Request, res: Response) => {
+router.post("/", async (req: Request, res: Response) => {
   const { email, password } = req.body as Auth;
 
   if (!email || !password) {
@@ -39,18 +39,19 @@ router.post("/signin", async (req: Request, res: Response) => {
       { expiresIn: '1d' }
     );
 
+    const isProd = process.env.NODE_ENV === "production";
     // Set cookies
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
       maxAge: 1000 * 60 * 60 
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
       maxAge: 1000 * 60 * 60 * 24 ,
     });
 

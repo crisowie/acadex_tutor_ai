@@ -1,12 +1,13 @@
 // context/AuthContext.tsx
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import WebApp from "@twa-dev/sdk";
 import axios from "axios";
 import { AuthContextType } from "../types";
-
+import { useNavigate } from "react-router-dom";
 // Axios global setup
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = "https://acadex-tutor-ai.onrender.com";
-// axios.defaults.baseURL ="http://localhost:5050";
+// axios.defaults.baseURL = "http://localhost:5050";
 // Create Auth Context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -25,7 +26,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState<boolean>(true);
   document.cookie.split(';').forEach(c => console.log(c.trim()));
-
+  const navigate = useNavigate();
   // Detect password reset flow
 
 
@@ -33,27 +34,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const initialize = async () => {
       const onResetPage = window.location.pathname.includes("/reset-password");
       const recoveryFlow = window.location.hash.includes("type=recovery");
-  
+
       if (onResetPage && recoveryFlow) {
         console.log("Skipping session fetch during password reset flow.");
         setLoading(false);
         return;
       }
+
       try {
-        await axios.post("/auth/refresh-token",);
+        // ✅ Check if running inside Telegram WebApp
+        const WebApp = (window as any).Telegram?.WebApp;
+        if (WebApp?.initData) {
+          console.log("Detected Telegram WebApp, attempting login...");
+          const { data } = await axios.post("/auth/tel", { initData: WebApp.initData });
+          setUser(data.user); // backend sends { message, data: profile }
+
+          // ✅ Redirect to dashboard
+          navigate("/dashboard");
+          setLoading(false);
+          return;
+        }
+
+        // 👉 Step 2: Else fallback to normal refresh-token flow
+        await axios.post("/auth/refresh-token");
         const { data } = await axios.get("/user/profile");
         setUser(data.user);
       } catch (err) {
-        console.error("🚫 Session refresh failed:", err);
+        console.error("🚫 Session init failed:", err);
         setUser(null);
       } finally {
         setLoading(false);
       }
     };
-  
+
     initialize();
   }, []);
-  
+
+
 
 
   // Fetch authenticated user, auto-refresh if unauthorized
@@ -134,7 +151,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const { data } = await axios.post("/auth/signin", { email, password });
       setUser(data.user);
-      await fetchUser(); 
+      await fetchUser();
       return true;
     } catch (err: any) {
       console.error("Login Error:", err.response?.data?.error || err.message);
@@ -144,12 +161,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
   // Onboarding
-  const Onboarding = async (learning_goal: string, skill_level: string,custom_goal: string): Promise<boolean> => {
+  const Onboarding = async (learning_goal: string, skill_level: string, custom_goal: string): Promise<boolean> => {
     setLoading(true);
     try {
-      const { data } = await axios.post("/auth/onboarding", { learning_goal, skill_level,custom_goal });
+      const { data } = await axios.post("/auth/onboarding", { learning_goal, skill_level, custom_goal });
       setUser(data.user);
-      await fetchUser(); 
+      await fetchUser();
       return true;
     } catch (err: any) {
       console.error("Login Error:", err.response?.data?.error || err.message);

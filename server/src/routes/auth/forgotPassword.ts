@@ -6,7 +6,7 @@ dotenv.config();
 const router = express.Router();
 
 // 🔐 Forgot Password Endpoint
-router.post("/forgot-password", async (req: Request, res: Response) => {
+router.post("/", async (req: Request, res: Response) => {
   const { email } = req.body;
 
   // ✅ Validate Email

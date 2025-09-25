@@ -5,7 +5,7 @@ import { authMiddleware } from "../../config/middleware"
 
 const router = express.Router();
 
-router.post("/onboarding", authMiddleware, async (req: Request, res: Response) => {
+router.post("/", authMiddleware, async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user?.userId; // ✅ from middleware
     const { learning_goal, skill_level, custom_goal } = req.body;

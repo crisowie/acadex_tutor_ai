@@ -40,7 +40,7 @@ const navigation = [
   { title: "Resources", url: "/resources", icon: Library },
   // { title: "Community", url: "/community", icon: Users2 },
   // { title: "Beta Features", url: "/beta", icon: LightbulbIcon },
-  { title: "Profile Setup", url: "/profile-setup", icon: User },
+  // { title: "Profile Setup", url: "/profile-setup", icon: User },
 ];
 
 export function AppSidebar() {

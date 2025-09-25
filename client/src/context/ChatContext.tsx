@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Chat, ChatContextType } from "@/types";
 import { Message } from "@/types";
@@ -6,7 +7,7 @@ import { useChatHistory } from "@/hooks/useChatHistory";
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL =  "https://acadex-tutor-ai.onrender.com";
+axios.defaults.baseURL = "https://acadex-tutor-ai.onrender.com";
 // axios.defaults.baseURL = "http://localhost:5050";
 
 export const useChat = () => {
@@ -25,7 +26,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [chatId, setChatId] = useState<string | null>(null); // add chatId tracking
   const { chatHistory, refresh } = useChatHistory()
-
+  const navigate = useNavigate();
 
 
   const sendMessage = async (userMessage: string) => {
@@ -44,13 +45,15 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       const returnedChatId = res.data.chat_id;
       const resources = res.data.resources || []
 
-      if (!chatId) setChatId(returnedChatId); // store it if it’s a new chat
+      if (!chatId) {
+        setChatId(returnedChatId);
+      }
 
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: aiReply, resources },
       ]);
-      return { aiReply, resources };
+      return { aiReply: String(aiReply), resources: [], chat_id: returnedChatId };
     } catch (err) {
       console.error("Chat error:", err);
       const errorReply = "Sorry, I couldn't respond.";
@@ -88,7 +91,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
 
     try {
       // Fetch updated chats from the server
-      const res = await axios.get("/api/chat-history");
+      const res = await axios.get("/api/chats-history");
 
       if (res.data?.chats) {
         setChat(res.data.chats); // ✅ update the sidebar chat list
@@ -98,6 +101,49 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     }
     await refresh()
   };
+
+  // inside ChatContext or PdfContext
+  const summarizePDF = async (pdfFile: File, chat_id: string) : Promise<{ chat_id: string; aiReply: string; resources: any[] }> => {
+    setLoading(true);
+
+    const formData = new FormData();
+    formData.append("file", pdfFile);
+    if (chat_id) formData.append("chat_id", chat_id);
+
+    try {
+      const res = await axios.post("/api/pdf-summarizer", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      const aiReply = res.data.reply ?? "";
+      const returnedChatId = res.data.chat_id ?? chat_id;
+      const resources = res.data.resources ?? [];
+
+      if (!chat_id && returnedChatId) {
+        setChatId(returnedChatId);
+      }
+
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: aiReply, timestamp: new Date(), resources },
+      ]);
+
+      return { chat_id: returnedChatId, aiReply: String(aiReply), resources };
+
+    } catch (err) {
+      console.error("PDF summarize error:", err);
+      const errorReply = "Sorry, I couldn’t summarize that PDF.";
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: errorReply, timestamp: new Date(), resources: [] },
+      ]);
+      return { chat_id: chat_id, aiReply: errorReply, resources: [] };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -150,7 +196,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   };
 
   return (
-    <ChatContext.Provider value={{ messages, setMessages, sendMessage, loading, chatId, loadChatHistory, startNewChat, chats, setChat, fetchSingleChat }}>
+    <ChatContext.Provider value={{ messages, setMessages, sendMessage, loading, chatId, loadChatHistory, startNewChat, chats, setChat, fetchSingleChat, summarizePDF }}>
       {children}
     </ChatContext.Provider>
   );
