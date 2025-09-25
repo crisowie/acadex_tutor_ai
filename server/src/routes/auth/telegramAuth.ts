@@ -7,7 +7,9 @@ dotenv.config();
 
 const router = express.Router();
 
-const { TELEGRAM_BOT_TOKEN, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env;
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
 
 if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET || !TELEGRAM_BOT_TOKEN) {
   throw new Error("Missing required env vars (ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, TELEGRAM_BOT_TOKEN)");
@@ -18,7 +20,7 @@ router.post("/", async (req: Request, res: Response) => {
     const { initData } = req.body as { initData?: string };
     if (!initData) return res.status(400).json({ error: "No initData" });
 
-    const verified = verifyTelegramInitData(initData, TELEGRAM_BOT_TOKEN!);
+    const verified = verifyTelegramInitData(initData, TELEGRAM_BOT_TOKEN);
     if (!verified) return res.status(401).json({ error: "Invalid Telegram data" });
 
     const telegramUser = verified.user;
@@ -57,8 +59,8 @@ router.post("/", async (req: Request, res: Response) => {
 
     // Generate tokens
     const payload = { userId: profile.id, email: profile.email, telegramId: profile.telegram_id };
-    const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET!, { expiresIn: "1h" });
-    const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET!, { expiresIn: "1d" });
+    const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
+    const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: "1d" });
 
     // Set cookies
     const isProd = process.env.NODE_ENV === "production";
