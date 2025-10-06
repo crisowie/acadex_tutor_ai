@@ -1,5 +1,5 @@
 // routes/youtube.ts
-import express,{Request,Response} from "express";
+import express, { Request, Response } from "express";
 import axios from "axios";
 import { authMiddleware } from "../../config/middleware";
 
@@ -61,7 +61,7 @@ router.get("/search", authMiddleware, async (req: Request, res: Response) => {
 });
 
 // GET /api/youtube/video/:videoId
-router.get("/video/:videoId", async (req, res) => {
+router.get("/video/:videoId", async (req: Request, res: Response) => {
   try {
     const { videoId } = req.params;
     if (!videoId) return res.status(400).json({ error: "Missing videoId" });

@@ -13,7 +13,7 @@ const upload = multer({
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB limit
   },
-  fileFilter: (req, file, cb) => {
+  fileFilter: (req:Request, file:Express.Multer.File, cb:any) => {
     if (file.mimetype === 'application/pdf') {
       cb(null, true);
     } else {
@@ -281,7 +281,7 @@ router.post("/", authMiddleware, upload.single("pdf"), async (req: Request, res:
       message: "Quiz generated successfully from PDF"
     });
 
-  } catch (error) {
+  } catch (error:Error | any) {
     console.error("❌ Error in PDF quiz generation:", error);
 
     // Handle specific error types

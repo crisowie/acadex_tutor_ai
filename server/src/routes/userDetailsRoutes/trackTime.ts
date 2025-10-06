@@ -30,7 +30,7 @@ router.post('/track-session', async (req: Request, res: Response) => {
   res.status(200).json({ message: 'Session stored' });
 });
 
-router.get("/total-time/:userId", async (req, res) => {
+router.get("/total-time/:userId", async (req: Request, res: Response) => {
   const { userId } = req.params;
 
   if (!userId) {
