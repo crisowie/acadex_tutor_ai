@@ -115,7 +115,7 @@ export default function Notes() {
                           {note.title}
                         </h3>
                         <Badge variant="outline" className="text-xs">
-                          Chat #{note.chat_id?.slice(0, 6) || "unknown"}
+                          Chat
                         </Badge>
                       </div>
 

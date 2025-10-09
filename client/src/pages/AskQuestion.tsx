@@ -16,8 +16,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useNotes } from "@/context/NoteContext";
 import { X, Check } from "lucide-react";
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "http://localhost:5050";
-// axios.defaults.baseURL = "https://acadex-tutor-ai.onrender.com";
+// axios.defaults.baseURL = "http://localhost:5050";
+axios.defaults.baseURL = "https://acadex-tutor-ai.onrender.com";
 
 export default function AskQuestion() {
   const { chatId } = useParams();
@@ -207,7 +207,7 @@ export default function AskQuestion() {
         </div>
       )}
       {/* Main Content Area - Takes remaining space minus input */}
-      <div className="flex-1 overflow-y-auto pb-4 scrollbar-thumb-black"> 
+      <div className="flex-1 overflow-y-auto pb-4 scrollbar-thumb-black ">
         {messages.length === 0 ? (
           // Welcome Screen - Centered content
           <div className="flex items-center justify-center min-h-full p-4">
@@ -328,7 +328,7 @@ export default function AskQuestion() {
       {/* Fixed Input Area at Bottom */}
       <div className="sticky bottom-0 flex-shrink-0 border-border   p-2">
         <div className="max-w-4xl mx-auto">
-          <form onSubmit={handleSubmit} className="relative flex items-end">
+          <form onSubmit={handleSubmit} className="relative flex items-end bottom-0">
             {/* Hidden File Input */}
             <input
               type="file"
@@ -363,7 +363,7 @@ export default function AskQuestion() {
                placeholder:text-muted-foreground placeholder:pb-4"
               disabled={isLoading}
             />
-             {/* border p-1 rounded-sm */}
+            {/* border p-1 rounded-sm */}
 
             <Button
               type="submit"
