@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./server
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./server/.env
+    depends_on:
+      - db
+
+  frontend:
+    build: ./client
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+  # Optional: if you use a DB like Postgres or Mongo
+  db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:

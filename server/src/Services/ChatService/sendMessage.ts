@@ -30,7 +30,7 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
             {
               role: 'system',
               content:
-                'Generate a short educational title (max 4 words) for this conversation. Return only the title—no greetings or extra text.',
+                'Generate a short educational title (max 4 words) for this conversation. Return only the title—no greetings or extra text. The title should be relevant to academic subjects or courses.  ',
             },
             { role: 'user', content: message },
           ],
@@ -57,7 +57,7 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
             {
               role: 'system',
               content:
-                "From the given conversation, extract only the most relevant academic subject or course title. Do not include greetings, punctuation, or extra words. Respond with a single subject or course name only, e.g., 'Physics', 'Computer Science', or 'Modern European History'. If the subject is unclear, respond with 'General Studies."
+                "from the given conversation, extract only the most relevant academic subject or course title. Do not include greetings, punctuation, or extra words. Respond with a single subject or course name only, e.g., 'Physics', 'Computer Science', or 'Modern European History'. If the subject is unclear, respond with 'General Studies'. Also ensure the subject is capitalized properly, and contains no special characters or numbers, also very short, ideally three or four words."
             },
             { role: 'user', content: message },
           ],

@@ -6,6 +6,12 @@
 All colors MUST be HSL.
 */
 
+/* Prevent any content from forcing horizontal scroll */
+* {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
 
 
 

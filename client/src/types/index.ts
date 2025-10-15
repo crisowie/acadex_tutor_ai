@@ -74,6 +74,7 @@ export interface Message {
   role: "user" | "assistant"
   timestamp?: Date;
   resources?: { title: string; url?: string; type?: string }[];  // ✅ added
+  streaming?: boolean;  // ✅ added
 }
 
 export interface Chat {

@@ -102,7 +102,7 @@ export const useBookmarks = (type?: BookmarkType) => {
   const checkIfBookmarked = useCallback(
     async (type: BookmarkType, itemId: string): Promise<boolean> => {
       try {
-        const res = await axios.get(`/bookmark/${type}/${itemId}`);
+        const res = await axios.get(`/bookmark/single/${type}/${itemId}`);
         return res?.data?.bookmarked ?? false;
       } catch (err) {
         console.error("Error checking bookmark:", err);
@@ -136,7 +136,7 @@ export const useBookmarks = (type?: BookmarkType) => {
   const removeBookmark = useCallback(
     async (type: BookmarkType, itemId: string) => {
       try {
-        await axios.delete(`/bookmark/${type}/${itemId}`);
+        await axios.delete(`/bookmark/delete/${type}/${itemId}`);
         fetchBookmarks(); // Refresh the bookmarks list
       } catch (err: any) {
         console.error("Error removing bookmark:", err.message);

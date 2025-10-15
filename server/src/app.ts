@@ -34,7 +34,7 @@ const globalLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-app.use(globalLimiter);
+// app.use(globalLimiter);
 // Rate limit for auth routes
 const authLimiter = rateLimit({
   windowMs: 60 * 1000 * 10, // 1 min window
@@ -53,13 +53,13 @@ const signupLimiter = rateLimit({
 });
 
 // app.use("/auth/login", loginLimiter);
-app.use("/auth/signup", signupLimiter);
+// app.use("/auth/signup", signupLimiter);
 
 // Apply general auth limiter only to the rest
-app.use(
-  ["/auth/forgot-password", "/auth/refresh", "/auth/logout", "/auth/delete", "/auth/google"],
-  authLimiter
-);
+// app.use(
+//   ["/auth/forgot-password", "/auth/refresh", "/auth/logout", "/auth/delete", "/auth/google"],
+//   authLimiter
+// );
 
 app.use("/auth", GoogleAuth)
 app.use("/me", MeRoute)
@@ -78,7 +78,7 @@ const apiLimiter = rateLimit({
   max: 30, // 30 API requests per minute
   message: "Too many API requests, please slow down.",
 });
-app.use("/api", apiLimiter);
+// app.use("/api", apiLimiter);
 app.use("/api", Chat)
 
 // Youtube Api

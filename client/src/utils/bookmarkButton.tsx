@@ -27,7 +27,7 @@ const BookmarkToggleButton: React.FC<BookmarkToggleButtonProps> = ({ itemId, typ
     const checkBookmark = async () => {
       try {
         setIsBookmarked(false); // reset first to avoid stale UI
-        const response = await axios.get(`/user/bookmarks/${type}/${itemId}`);
+        const response = await axios.get(`/bookmark/${type}/${itemId}`);
         setIsBookmarked(response.data?.bookmarked || false);
       } catch (error) {
         console.error('Error checking bookmark status:', error);
@@ -50,12 +50,12 @@ const BookmarkToggleButton: React.FC<BookmarkToggleButtonProps> = ({ itemId, typ
     try {
       if (isBookmarked) {
         // Unbookmark
-        await axios.delete(`/user/bookmarks/${type}/${itemId}`);
+        await axios.delete(`/bookmark/${type}/${itemId}`);
         setIsBookmarked(false);
         toast.success("Bookmark removed");
       } else {
         // Add bookmark
-        await axios.post('/user/bookmarks', { type, item_id: itemId });
+        await axios.post('/bookmark/add', { type, item_id: itemId });
         setIsBookmarked(true);
         toast.success("Bookmarked successfully");
       }

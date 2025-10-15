@@ -13,18 +13,9 @@ type MessageRendererProps = {
 };
 
 export default function MessageRenderer({ content, resources }: MessageRendererProps) {
-  // Debug logging
-  console.log('MessageRenderer received:', { 
-    contentType: typeof content, 
-    contentLength: content?.length || 0,
-    content: content?.substring(0, 100) || 'undefined/null',
-    hasResources: !!resources?.length 
-  });
-
   const renderContent = (text: string) => {
-    // Add safety check for undefined/null text
     if (!text || typeof text !== 'string') {
-      return [<p key="empty" className="text-gray-400 italic">No content available</p>];
+      return [<p key="empty" className="text-gray-400 italic text-xs sm:text-sm">No content available</p>];
     }
 
     const lines = text.split('\n');
@@ -39,9 +30,9 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
       if (currentListItems.length > 0) {
         if (currentListType === 'ordered') {
           elements.push(
-            <ol key={elements.length} className="list-decimal list-inside space-y-1 mb-4 ml-4">
+            <ol key={elements.length} className="list-decimal list-inside space-y-1 mb-3 sm:mb-4 ml-3 sm:ml-4 text-xs sm:text-sm">
               {currentListItems.map((item, i) => (
-                <li key={i} className="text-gray-100 leading-relaxed">
+                <li key={i} className="text-gray-100 leading-relaxed break-words overflow-wrap-anywhere">
                   {renderInlineFormatting(item)}
                 </li>
               ))}
@@ -49,9 +40,9 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
           );
         } else {
           elements.push(
-            <ul key={elements.length} className="list-disc list-inside space-y-1 mb-4 ml-4">
+            <ul key={elements.length} className="list-disc list-inside space-y-1 mb-3 sm:mb-4 ml-3 sm:ml-4 text-xs sm:text-sm">
               {currentListItems.map((item, i) => (
-                <li key={i} className="text-gray-100 leading-relaxed">
+                <li key={i} className="text-gray-100 leading-relaxed break-words overflow-wrap-anywhere">
                   {renderInlineFormatting(item)}
                 </li>
               ))}
@@ -66,9 +57,9 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
     const flushCodeBlock = () => {
       if (codeBlockContent.length > 0) {
         elements.push(
-          <div key={elements.length} className="mb-4">
-            <pre className="bg-neutral-900 rounded-lg p-4 overflow-x-auto border border-neutral-700">
-              <code className={`text-sm text-gray-100 ${codeBlockLanguage ? `language-${codeBlockLanguage}` : ''}`}>
+          <div key={elements.length} className="mb-3 sm:mb-4 w-full overflow-hidden">
+            <pre className="bg-neutral-900 rounded-lg p-2 sm:p-3 md:p-4 border border-neutral-700 overflow-x-auto max-w-full text-xs sm:text-sm">
+              <code className={`text-gray-100 block whitespace-pre ${codeBlockLanguage ? `language-${codeBlockLanguage}` : ''}`}>
                 {codeBlockContent.join('\n')}
               </code>
             </pre>
@@ -82,7 +73,6 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
     lines.forEach((line, index) => {
       const trimmedLine = line.trim();
 
-      // Handle code blocks
       if (trimmedLine.startsWith('```')) {
         if (inCodeBlock) {
           inCodeBlock = false;
@@ -108,25 +98,25 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
         
         if (level === 1) {
           elements.push(
-            <h1 key={elements.length} className="text-2xl font-bold text-green-200 mb-4 mt-6 first:mt-0">
+            <h1 key={elements.length} className="text-lg sm:text-xl md:text-2xl font-bold text-green-200 mb-3 sm:mb-4 mt-4 sm:mt-6 first:mt-0 break-words overflow-wrap-anywhere max-w-full">
               {renderInlineFormatting(text)}
             </h1>
           );
         } else if (level === 2) {
           elements.push(
-            <h2 key={elements.length} className="text-xl font-semibold text-green-300 mb-3 mt-5">
+            <h2 key={elements.length} className="text-base sm:text-lg md:text-xl font-semibold text-green-300 mb-2 sm:mb-3 mt-3 sm:mt-5 break-words overflow-wrap-anywhere max-w-full">
               {renderInlineFormatting(text)}
             </h2>
           );
         } else if (level === 3) {
           elements.push(
-            <h3 key={elements.length} className="text-lg font-semibold text-neutral-100 mb-2 mt-4">
+            <h3 key={elements.length} className="text-sm sm:text-base md:text-lg font-semibold text-neutral-100 mb-2 mt-3 sm:mt-4 break-words overflow-wrap-anywhere max-w-full">
               {renderInlineFormatting(text)}
             </h3>
           );
         } else {
           elements.push(
-            <h4 key={elements.length} className="text-base font-medium text-neutral-200 mb-2 mt-3">
+            <h4 key={elements.length} className="text-sm sm:text-base font-medium text-neutral-200 mb-2 mt-2 sm:mt-3 break-words overflow-wrap-anywhere max-w-full">
               {renderInlineFormatting(text)}
             </h4>
           );
@@ -138,7 +128,7 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
       if (trimmedLine.match(/^---+$|^\*\*\*+$|^___+$/)) {
         flushList();
         elements.push(
-          <hr key={elements.length} className="border-neutral-700 my-4" />
+          <hr key={elements.length} className="border-neutral-700 my-3 sm:my-4 w-full" />
         );
         return;
       }
@@ -148,14 +138,14 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
         flushList();
         const quoteText = trimmedLine.replace(/^>\s*/, '');
         elements.push(
-          <blockquote key={elements.length} className="border-l-4 border-green-600 pl-4 py-2 mb-4 bg-neutral-800/50 rounded-r">
-            <p className="text-gray-200 italic">{renderInlineFormatting(quoteText)}</p>
+          <blockquote key={elements.length} className="border-l-4 border-green-600 pl-3 sm:pl-4 py-2 mb-3 sm:mb-4 bg-neutral-800/50 rounded-r w-full overflow-hidden">
+            <p className="text-gray-200 italic break-words overflow-wrap-anywhere text-xs sm:text-sm">{renderInlineFormatting(quoteText)}</p>
           </blockquote>
         );
         return;
       }
 
-      // Tables (basic detection)
+      // Tables
       if (trimmedLine.includes('|') && lines[index + 1]?.includes('|')) {
         flushList();
         const tableLines = [];
@@ -190,27 +180,27 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
         return;
       }
 
-      // Math equations (LaTeX style)
-      if (trimmedLine.match(/^\\\[.*\\\]$/) || trimmedLine.match(/^\$\$.*\$\$$/)) {
+      // Math equations
+      if (trimmedLine.match(/^\\\[.*\\\]$/) || trimmedLine.match(/^\$\$.*\$\$/)) {
         flushList();
         const equation = trimmedLine
           .replace(/^\\\[|\\\]$/g, '')
-          .replace(/^\$\$|\$\$$/g, '');
+          .replace(/^\$\$|\$\$/g, '');
         elements.push(
-          <div key={elements.length} className="mb-4 p-4 bg-neutral-900 rounded-lg border border-neutral-700">
-            <code className="text-green-300 text-center block font-mono">{equation}</code>
+          <div key={elements.length} className="mb-3 sm:mb-4 p-3 sm:p-4 bg-neutral-900 rounded-lg border border-neutral-700 overflow-x-auto w-full max-w-full">
+            <code className="text-green-300 text-center block font-mono text-xs sm:text-sm break-all">{equation}</code>
           </div>
         );
         return;
       }
 
-      // Inline code blocks (single backticks)
+      // Inline code blocks
       if (trimmedLine.match(/^`.*`$/)) {
         flushList();
         const codeText = trimmedLine.replace(/^`|`$/g, '');
         elements.push(
-          <div key={elements.length} className="mb-3">
-            <code className="bg-neutral-900 px-2 py-1 rounded text-green-300 font-mono text-sm">
+          <div key={elements.length} className="mb-2 sm:mb-3 w-full max-w-full overflow-hidden">
+            <code className="bg-neutral-900 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-green-300 font-mono text-xs sm:text-sm break-all inline-block max-w-full">
               {codeText}
             </code>
           </div>
@@ -222,7 +212,7 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
       if (trimmedLine === '') {
         flushList();
         if (elements.length > 0 && elements[elements.length - 1].type !== 'br') {
-          elements.push(<div key={elements.length} className="mb-2" />);
+          elements.push(<div key={elements.length} className="mb-1 sm:mb-2" />);
         }
         return;
       }
@@ -230,13 +220,12 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
       // Regular paragraphs
       flushList();
       elements.push(
-        <p key={elements.length} className="text-gray-100 mb-3 leading-relaxed">
+        <p key={elements.length} className="text-gray-100 mb-2 sm:mb-3 leading-relaxed break-words overflow-wrap-anywhere max-w-full text-xs sm:text-sm md:text-base">
           {renderInlineFormatting(trimmedLine)}
         </p>
       );
     });
 
-    // Flush any remaining lists or code blocks
     flushList();
     flushCodeBlock();
 
@@ -244,12 +233,10 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
   };
 
   const renderInlineFormatting = (text: string): React.ReactNode => {
-    // Add safety check for undefined/null text
     if (!text || typeof text !== 'string') {
       return '';
     }
 
-    // Handle bold, italic, code, and links
     const parts = [];
     let currentText = text;
     let key = 0;
@@ -261,7 +248,7 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
         const beforeBold = currentText.slice(0, boldMatch.index);
         if (beforeBold) parts.push(beforeBold);
         parts.push(
-          <strong key={key++} className="font-semibold text-white">
+          <strong key={key++} className="font-semibold text-white break-words overflow-wrap-anywhere">
             {boldMatch[1]}
           </strong>
         );
@@ -275,7 +262,7 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
         const beforeItalic = currentText.slice(0, italicMatch.index);
         if (beforeItalic) parts.push(beforeItalic);
         parts.push(
-          <em key={key++} className="italic text-gray-200">
+          <em key={key++} className="italic text-gray-200 break-words overflow-wrap-anywhere">
             {italicMatch[1]}
           </em>
         );
@@ -289,7 +276,7 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
         const beforeCode = currentText.slice(0, codeMatch.index);
         if (beforeCode) parts.push(beforeCode);
         parts.push(
-          <code key={key++} className="bg-neutral-900 px-1 py-0.5 rounded text-green-300 font-mono text-sm">
+          <code key={key++} className="bg-neutral-900 px-1 sm:px-1.5 py-0.5 rounded text-green-300 font-mono text-[10px] sm:text-xs break-all max-w-full inline-block">
             {codeMatch[1]}
           </code>
         );
@@ -308,17 +295,16 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
             href={linkMatch[2]}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-400 hover:text-blue-300 underline inline-flex items-center gap-1"
+            className="text-blue-400 hover:text-blue-300 underline inline-flex items-center gap-1 break-all max-w-full text-xs sm:text-sm overflow-wrap-anywhere"
           >
-            {linkMatch[1]}
-            <ExternalLink className="w-3 h-3" />
+            <span className="break-all overflow-wrap-anywhere">{linkMatch[1]}</span>
+            <ExternalLink className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
           </a>
         );
         currentText = currentText.slice((linkMatch.index || 0) + linkMatch[0].length);
         continue;
       }
 
-      // No more formatting found, add the rest
       parts.push(currentText);
       break;
     }
@@ -331,17 +317,16 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
       line.split('|').map(cell => cell.trim()).filter(cell => cell !== '')
     );
     
-    // Skip separator row (usually second row with dashes)
     const headerRow = rows[0];
     const dataRows = rows.slice(2);
 
     return (
-      <div key={key} className="mb-4 overflow-x-auto">
-        <table className="w-full border-collapse border border-neutral-700 rounded-lg overflow-hidden">
+      <div key={key} className="mb-3 sm:mb-4 w-full overflow-x-auto max-w-full">
+        <table className="min-w-full border-collapse border border-neutral-700 rounded-lg overflow-hidden text-xs sm:text-sm">
           <thead className="bg-neutral-800">
             <tr>
               {headerRow.map((header, i) => (
-                <th key={i} className="border border-neutral-700 px-3 py-2 text-left font-semibold text-green-300">
+                <th key={i} className="border border-neutral-700 px-2 sm:px-3 py-1.5 sm:py-2 text-left font-semibold text-green-300 break-words whitespace-normal min-w-[80px] sm:min-w-[100px] max-w-[200px] overflow-wrap-anywhere">
                   {renderInlineFormatting(header)}
                 </th>
               ))}
@@ -351,7 +336,7 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
             {dataRows.map((row, i) => (
               <tr key={i} className={i % 2 === 0 ? 'bg-neutral-900/50' : 'bg-neutral-800/30'}>
                 {row.map((cell, j) => (
-                  <td key={j} className="border border-neutral-700 px-3 py-2 text-gray-100">
+                  <td key={j} className="border border-neutral-700 px-2 sm:px-3 py-1.5 sm:py-2 text-gray-100 break-words whitespace-normal max-w-[200px] overflow-wrap-anywhere">
                     {renderInlineFormatting(cell)}
                   </td>
                 ))}
@@ -363,37 +348,37 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
     );
   };
 
-  // Add safety check for the main content prop
   if (!content && (!resources || resources.length === 0)) {
     return (
-      <div className="text-gray-400 italic">
+      <div className="text-gray-400 italic text-xs sm:text-sm">
         No content to display
       </div>
     );
   }
 
   return (
-    <div className="space-y-1">
-      {content && renderContent(content)}
+    <div className="space-y-1 w-full max-w-full overflow-x-hidden overflow-y-visible">
+
+      {content && <div className="break-words w-full max-w-full overflow-hidden">{renderContent(content)}</div>}
       
-      {/* Resources Section */}
+      {/* Resources Section - FULLY RESPONSIVE */}
       {resources && resources.length > 0 && (
-        <div className="mt-6 pt-4 border-t border-neutral-700">
-          <div className="flex items-center gap-2 mb-3">
-            <BookOpen className="w-4 h-4 text-green-400" />
-            <h3 className="text-sm font-semibold text-green-300">
+        <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-neutral-700 w-full max-w-full overflow-hidden">
+          <div className="flex items-center gap-2 mb-2 sm:mb-3">
+            <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" />
+            <h3 className="text-xs sm:text-sm font-semibold text-green-300">
               Further Resources
             </h3>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 w-full max-w-full">
             {resources.map((resource, index) => (
-              <div key={index} className="flex items-start gap-2 p-3 bg-neutral-800/50 rounded-lg border border-neutral-700">
-                <FileText className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-100">{resource.title}</span>
+              <div key={index} className="flex items-start gap-2 p-2 sm:p-3 bg-neutral-800/50 rounded-lg border border-neutral-700 w-full max-w-full overflow-hidden">
+                <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                <div className="flex-1 min-w-0 max-w-full overflow-hidden">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-medium text-gray-100 break-words overflow-wrap-anywhere text-xs sm:text-sm max-w-full">{resource.title}</span>
                     {resource.type && (
-                      <span className="text-xs px-2 py-0.5 bg-neutral-700 rounded text-gray-300">
+                      <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 bg-neutral-700 rounded text-gray-300 flex-shrink-0 whitespace-nowrap">
                         {resource.type}
                       </span>
                     )}
@@ -403,10 +388,10 @@ export default function MessageRenderer({ content, resources }: MessageRendererP
                       href={resource.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-blue-400 hover:text-blue-300 underline inline-flex items-center gap-1 mt-1"
+                      className="text-xs sm:text-sm text-blue-400 hover:text-blue-300 underline inline-flex items-center gap-1 mt-1 break-all overflow-wrap-anywhere max-w-full"
                     >
-                      View Resource
-                      <ExternalLink className="w-3 h-3" />
+                      <span className="break-all overflow-wrap-anywhere truncate max-w-[250px] sm:max-w-full">View Resource</span>
+                      <ExternalLink className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
                     </a>
                   )}
                 </div>
