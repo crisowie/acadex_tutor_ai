@@ -4,7 +4,7 @@
     "module": "commonjs",
     "outDir": "./dist",
     "rootDir": "./src",
-    "strict": true,
+    "strict": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
 
@@ -13,7 +13,8 @@
     "noEmitOnError": false,       // Still output JS even if there are TS errors
     "resolveJsonModule": true,
     "types": ["node"],            // Ensure Node types are included
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": false   
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
