@@ -16,7 +16,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useNotes } from "@/context/NoteContext";
 
 axios.defaults.withCredentials = true;
-// axios.defaults.baseURL = "http://localhost:5050"; it
+// axios.defaults.baseURL = "http://localhost:5050"; 
 axios.defaults.baseURL = "https://acadex-tutor-ai.onrender.com";
 
 export default function AskQuestion() {

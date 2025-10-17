@@ -21,6 +21,10 @@ Summarize the following academic text into clear, structured notes.
    - Do not include greetings, filler text, or disclaimers.
   - Keep it educational and informative.
   - Title should be relevant to the content and should be short, 4 words max
+  - analyze the academic nature of the text and tailor the summary accordingly.
+  - Ensure the summary is suitable for study purposes.
+- ensure to ask a follow up question if the text is insufficient to generate a proper summary.
+Format the response as follows:
 Output format (plain text only):
 Title: <short title 4 words max>
 Summary: <summary>
