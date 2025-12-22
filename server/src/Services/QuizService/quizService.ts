@@ -1,7 +1,7 @@
 import axios from "axios";
 import { parse } from "path";
 
-export async function generateQuizWithGroq(topic: string) {
+export async function generateQuizWithGroq(topic: string, number: number) {
   const prompt = `
 Generate a multiple-choice quiz in strict JSON format only.
 Do not include explanations, introductions, or extra text. 
@@ -23,7 +23,7 @@ Output must be valid JSON that exactly matches this structure:
 }
 
 Rules:
-- Create at least 10 multiple-choice questions.
+- Create at least 10 or ${number} multiple-choice questions.
 - Do NOT always use the first option as the correct answer. Distribute correct answers across A, B, C, and D randomly.
 - Each option must be unique, concise, and plausible — avoid obvious filler answers.
 - If a large text is given (e.g., a novel or article), generate high-quality, concept-based questions instead of superficial chapter-based ones.

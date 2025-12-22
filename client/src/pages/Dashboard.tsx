@@ -9,7 +9,8 @@ import {
   Target,
   TrendingUp,
   Calendar,
-  Award
+  Award,
+  Notebook
 } from "lucide-react";
 import { useChat } from "@/context/ChatContext";
 import { useChatHistory } from "@/hooks/useChatHistory";
@@ -17,14 +18,16 @@ import { useMssgHistory } from "@/hooks/useMssgHistory";
 import { useTotalTime } from "@/hooks/useTimeOnline";
 import { useAuth } from "@/context/AuthContext";
 import { useQuiz } from "@/context/QuizContext";
-
+import { useNotes } from "@/context/NoteContext";
+import { useBookmarks } from "@/hooks/useBookmarks";
 export default function Dashboard() {
   const { messages } = useMssgHistory()
   const { user } = useAuth()
+  const { bookmarks } = useBookmarks()
   const { quizzes } = useQuiz()
   const { chatHistory } = useChatHistory()
   const { data, loading, error } = useTotalTime(user?.id || "");
-
+  const { notes } = useNotes()
   const totalTimeValue = loading
     ? 0
     : data
@@ -53,13 +56,19 @@ export default function Dashboard() {
       color: "text-primary",
     },
     {
+      title: "Note Highlights",
+      value: notes.length,
+      change: "+4",
+      icon: Notebook,
+      color: "text-green-500",
+    },
+    {
       title: "Total Study Time",
       value: totalTimeValue,
       change: "+25%",
       icon: Clock,
       color: "text-orange-500",
     },
-
     {
       title: "Topics Mastered",
       value: chatHistory.length,
@@ -111,26 +120,63 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-primary" />
-              Subject Progress
+              Bookmarks
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {chatHistory.slice(0, 4).map((subject) => (
-              <div key={subject.id} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{subject.subject_emphasis}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {subject.lessons}/{subject.total} lessons
+          <CardContent className="space-y-3">
+            {bookmarks.slice(0, 8).map((bookmark) => {
+              const { type } = bookmark;
+              let title = "";
+
+              // Extract title safely based on bookmark type
+              switch (type) {
+                case "chat":
+                  title = bookmark.item.title || "Untitled Chat";
+                  break;
+                case "video":
+                  title = bookmark.item.title || "Untitled Video";
+                  break;
+                case "resource":
+                  title = bookmark.item.title || "Untitled Resource";
+                  break;
+                case "question":
+                  title = bookmark.item.content || "Untitled Question";
+                  break;
+                default:
+                  title = "Untitled";
+              }
+
+              return (
+                <div
+                  key={bookmark.id}
+                  className="flex items-center justify-between border-b border-border/50 pb-2 last:border-none"
+                >
+                  <span className="text-sm font-medium truncate max-w-[70%]">
+                    {title}
+                  </span>
+                  <span
+                    className={`text-xs capitalize px-2 py-0.5 rounded-full ${type === "chat"
+                        ? "bg-purple-500/10 text-purple-500"
+                        : type === "video"
+                          ? "bg-red-500/10 text-red-500"
+                          : type === "resource"
+                            ? "bg-green-500/10 text-green-500"
+                            : "bg-blue-500/10 text-blue-500"
+                      }`}
+                  >
+                    {type}
                   </span>
                 </div>
-                <Progress value={subject.progress} className="h-2" />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{subject.progress}% complete</span>
-                  <span>{subject.total - subject.lessons} remaining</span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
+
+            {bookmarks.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-2">
+                No bookmarks yet.
+              </p>
+            )}
           </CardContent>
+
         </Card> */}
 
         {/* Recent Activity */}
@@ -163,7 +209,6 @@ export default function Dashboard() {
                     <p className="text-xs text-muted-foreground mt-1">
                       {new Date(activity.created_at).toLocaleString()}
                     </p>
-
                   </div>
                 </div>
               ))}
@@ -177,7 +222,7 @@ export default function Dashboard() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-primary" />
-            Today's Goals
+            Weekly Goals
           </CardTitle>
         </CardHeader>
         <CardContent>

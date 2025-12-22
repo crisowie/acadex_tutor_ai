@@ -14,6 +14,11 @@ export const useQuiz = () => {
   return context;
 };
 
+interface QuizDetails{
+  topic: string,
+  number?:number
+}
+
 export const QuizProvider = ({ children }: { children: ReactNode }) => {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [currentQuiz, setCurrentQuiz] = useState<Quiz | null>(null);

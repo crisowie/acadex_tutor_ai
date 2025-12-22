@@ -7,8 +7,8 @@ import BookmarkToggleButton from "@/utils/bookmarkButton";
 
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "https://acadex-tutor-ai.onrender.com";
-// axios.defaults.baseURL = "http://localhost:5050";
+// axios.defaults.baseURL = "https://acadex-tutor-ai.onrender.com";
+axios.defaults.baseURL = "http://localhost:5050";
 
 export const WatchPage = () => {
   const { videoId } = useParams(); // get videoId from URL

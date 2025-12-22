@@ -27,12 +27,15 @@ router.delete("/:chatId", authMiddleware, async (req: Request, res: Response) =>
     }
 
     // 2. Delete the chat
-    const { error: deleteError } = await supabase
+    const {data: deletedChat, error: deleteError } = await supabase
       .from("chats")
       .delete()
       .eq("id", chatId)
-      .eq("user_id", userId);
-
+      .eq("user_id", userId)
+      .select()
+    console.log("Chat row from DB:", chat);
+    console.log("Decoded userId:", userId);
+    console.log("Deleted chat result:", deletedChat, deleteError);
     if (deleteError) {
       console.error("Delete error:", deleteError);
       return res.status(500).json({ error: "Failed to delete chat" });

@@ -78,9 +78,14 @@ export interface Message {
 }
 
 export interface Chat {
-  id?: number;
+  id?: string;
   title: string,
   timestamp: Date
+}
+
+interface ChatData {
+  chatId: string;
+  messages: Message[];
 }
 
 
@@ -96,7 +101,12 @@ export interface ChatContextType {
   chats: Chat[];
   setChat: React.Dispatch<React.SetStateAction<Chat[]>>;
   fetchSingleChat: (id: string) => Promise<void>;
-  summarizePDF:(pdfFile: File, chat_id: string) => Promise<{ chat_id: string | null; aiReply: string; resources: any[] } | null>;
+  deleteChat: (chatId: string) => Promise<boolean>;
+  OpenChat: (shareId: string) => Promise<ChatData | null>;
+  shareChat: (shareId: string) => Promise<boolean | any>
+  summarizePDF: (pdfFile: File, chat_id: string) => Promise<{ chat_id: string | null; aiReply: string; resources: any[] } | null>;
+  RenameChat: (chatId: string, newTitle: string) => Promise<boolean | any>;
+  BookmarkHistory: () => Promise<void>;
 }
 
 
@@ -353,6 +363,7 @@ export interface Question {
 
 export interface Quiz {
   id?: string;
+  number?: number;
   topic: string;
   subject: string;
   difficulty: string;
@@ -410,149 +421,149 @@ export interface NotesContextType {
 }
 
 
-  // Sample groups data
-export  const groupsData = [
-    {
-      id: 1,
-      title: "Data Science & AI Hub",
-      description: "Advanced discussions on machine learning, deep learning, and data analysis techniques",
-      members: 3247,
-      subject: "Computer Science",
-      privacy: "public",
-      activity: "high",
-      posts: 156,
-      online: 89,
-      avatar: "🤖",
-      trending: true,
-      tags: ["AI", "Machine Learning", "Python"]
-    },
-    {
-      id: 2,
-      title: "Advanced Calculus Masters",
-      description: "Tackling complex calculus problems and sharing innovative mathematical solutions",
-      members: 2156,
-      subject: "Mathematics",
-      privacy: "public",
-      activity: "very-high",
-      posts: 234,
-      online: 156,
-      avatar: "∫",
-      trending: true,
-      tags: ["Calculus", "Analysis", "Proofs"]
-    },
-    {
-      id: 3,
-      title: "Molecular Biology Research",
-      description: "Cutting-edge research discussions, paper reviews, and experimental methodologies",
-      members: 1892,
-      subject: "Biology",
-      privacy: "private",
-      activity: "high",
-      posts: 98,
-      online: 67,
-      avatar: "🧬",
-      trending: false,
-      tags: ["Research", "Genetics", "Lab Work"]
-    },
-    {
-      id: 4,
-      title: "Quantum Physics Explorers",
-      description: "Dive deep into quantum mechanics, particle physics, and theoretical concepts",
-      members: 1654,
-      subject: "Physics",
-      privacy: "public",
-      activity: "medium",
-      posts: 145,
-      online: 45,
-      avatar: "⚛️",
-      trending: false,
-      tags: ["Quantum", "Theory", "Experiments"]
-    },
-    {
-      id: 5,
-      title: "Creative Writing Circle",
-      description: "Share your stories, get feedback, and improve your creative writing skills together",
-      members: 987,
-      subject: "Literature",
-      privacy: "public",
-      activity: "medium",
-      posts: 67,
-      online: 23,
-      avatar: "✍️",
-      trending: false,
-      tags: ["Writing", "Stories", "Poetry"]
-    },
-    {
-      id: 6,
-      title: "Organic Chemistry Lab",
-      description: "Laboratory techniques, reaction mechanisms, and synthesis strategies discussion",
-      members: 1234,
-      subject: "Chemistry",
-      privacy: "public",
-      activity: "high",
-      posts: 189,
-      online: 78,
-      avatar: "⚗️",
-      trending: true,
-      tags: ["Organic", "Synthesis", "Mechanisms"]
-    },
-    {
-      id: 7,
-      title: "Business Analytics Pro",
-      description: "Data-driven business insights, market analysis, and strategic planning discussions",
-      members: 2876,
-      subject: "Business",
-      privacy: "private",
-      activity: "very-high",
-      posts: 298,
-      online: 134,
-      avatar: "📊",
-      trending: true,
-      tags: ["Analytics", "Strategy", "Finance"]
-    },
-    {
-      id: 8,
-      title: "Software Engineering Best Practices",
-      description: "Code reviews, architecture patterns, and industry best practices for developers",
-      members: 4321,
-      subject: "Engineering",
-      privacy: "public",
-      activity: "very-high",
-      posts: 445,
-      online: 201,
-      avatar: "⚙️",
-      trending: true,
-      tags: ["Code", "Architecture", "DevOps"]
-    }
-  ];
+// Sample groups data
+export const groupsData = [
+  {
+    id: 1,
+    title: "Data Science & AI Hub",
+    description: "Advanced discussions on machine learning, deep learning, and data analysis techniques",
+    members: 3247,
+    subject: "Computer Science",
+    privacy: "public",
+    activity: "high",
+    posts: 156,
+    online: 89,
+    avatar: "🤖",
+    trending: true,
+    tags: ["AI", "Machine Learning", "Python"]
+  },
+  {
+    id: 2,
+    title: "Advanced Calculus Masters",
+    description: "Tackling complex calculus problems and sharing innovative mathematical solutions",
+    members: 2156,
+    subject: "Mathematics",
+    privacy: "public",
+    activity: "very-high",
+    posts: 234,
+    online: 156,
+    avatar: "∫",
+    trending: true,
+    tags: ["Calculus", "Analysis", "Proofs"]
+  },
+  {
+    id: 3,
+    title: "Molecular Biology Research",
+    description: "Cutting-edge research discussions, paper reviews, and experimental methodologies",
+    members: 1892,
+    subject: "Biology",
+    privacy: "private",
+    activity: "high",
+    posts: 98,
+    online: 67,
+    avatar: "🧬",
+    trending: false,
+    tags: ["Research", "Genetics", "Lab Work"]
+  },
+  {
+    id: 4,
+    title: "Quantum Physics Explorers",
+    description: "Dive deep into quantum mechanics, particle physics, and theoretical concepts",
+    members: 1654,
+    subject: "Physics",
+    privacy: "public",
+    activity: "medium",
+    posts: 145,
+    online: 45,
+    avatar: "⚛️",
+    trending: false,
+    tags: ["Quantum", "Theory", "Experiments"]
+  },
+  {
+    id: 5,
+    title: "Creative Writing Circle",
+    description: "Share your stories, get feedback, and improve your creative writing skills together",
+    members: 987,
+    subject: "Literature",
+    privacy: "public",
+    activity: "medium",
+    posts: 67,
+    online: 23,
+    avatar: "✍️",
+    trending: false,
+    tags: ["Writing", "Stories", "Poetry"]
+  },
+  {
+    id: 6,
+    title: "Organic Chemistry Lab",
+    description: "Laboratory techniques, reaction mechanisms, and synthesis strategies discussion",
+    members: 1234,
+    subject: "Chemistry",
+    privacy: "public",
+    activity: "high",
+    posts: 189,
+    online: 78,
+    avatar: "⚗️",
+    trending: true,
+    tags: ["Organic", "Synthesis", "Mechanisms"]
+  },
+  {
+    id: 7,
+    title: "Business Analytics Pro",
+    description: "Data-driven business insights, market analysis, and strategic planning discussions",
+    members: 2876,
+    subject: "Business",
+    privacy: "private",
+    activity: "very-high",
+    posts: 298,
+    online: 134,
+    avatar: "📊",
+    trending: true,
+    tags: ["Analytics", "Strategy", "Finance"]
+  },
+  {
+    id: 8,
+    title: "Software Engineering Best Practices",
+    description: "Code reviews, architecture patterns, and industry best practices for developers",
+    members: 4321,
+    subject: "Engineering",
+    privacy: "public",
+    activity: "very-high",
+    posts: 445,
+    online: 201,
+    avatar: "⚙️",
+    trending: true,
+    tags: ["Code", "Architecture", "DevOps"]
+  }
+];
 
 export const stats = [
-      {
-        title: "Total Groups",
-        value: "150+",
-        change: "+12%",
-        icon: Users,
-        color: "text-blue-400",
-      },
-      {
-        title: "Active Members",
-        value: "25.2K",
-        change: "+8%",
-        icon: TrendingUp,
-        color: "text-primary",
-      },
-      {
-        title: "Daily Posts",
-        value: "1.2K",
-        change: "+25%",
-        icon: MessageCircle,
-        color: "text-orange-400",
-      },
-      {
-        title: "New This Week",
-        value: "24",
-        change: "+4",
-        icon: Target,
-        color: "text-purple-400",
-      },
-    ];
+  {
+    title: "Total Groups",
+    value: "150+",
+    change: "+12%",
+    icon: Users,
+    color: "text-blue-400",
+  },
+  {
+    title: "Active Members",
+    value: "25.2K",
+    change: "+8%",
+    icon: TrendingUp,
+    color: "text-primary",
+  },
+  {
+    title: "Daily Posts",
+    value: "1.2K",
+    change: "+25%",
+    icon: MessageCircle,
+    color: "text-orange-400",
+  },
+  {
+    title: "New This Week",
+    value: "24",
+    change: "+4",
+    icon: Target,
+    color: "text-purple-400",
+  },
+];

@@ -13,7 +13,7 @@ const upload = multer({
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB limit
   },
-  fileFilter: (req:Request, file: any, cb:any) => {
+  fileFilter: (req: Request, file: any, cb: any) => {
     if (file.mimetype === 'application/pdf') {
       cb(null, true);
     } else {
@@ -44,39 +44,39 @@ function chunkTextForAI(text: string, maxSize: number = 60000): string {
   if (text.length <= maxSize) {
     return text;
   }
-  
+
   console.log("📄 Chunking large text from", text.length, "to", maxSize, "characters");
-  
+
   const lines = text.split('\n');
   let result = '';
   let currentSize = 0;
-  
+
   // Priority lines: headers, definitions, key concepts
   for (const line of lines) {
     const trimmed = line.trim();
     if (trimmed.length < 5) continue;
-    
+
     const isImportant = /^(Chapter|Section|Definition|Key|Important|Note:|Summary)/i.test(trimmed) ||
-                       trimmed.endsWith(':') ||
-                       /^\d+\./.test(trimmed);
-    
+      trimmed.endsWith(':') ||
+      /^\d+\./.test(trimmed);
+
     if (isImportant && currentSize + trimmed.length < maxSize) {
       result += trimmed + '\n';
       currentSize += trimmed.length;
     }
   }
-  
+
   // Fill remaining space with regular content
   for (const line of lines) {
     const trimmed = line.trim();
     if (trimmed.length < 5 || result.includes(trimmed)) continue;
-    
+
     if (currentSize + trimmed.length > maxSize) break;
-    
+
     result += trimmed + '\n';
     currentSize += trimmed.length;
   }
-  
+
   return result.trim() || text.substring(0, maxSize);
 }
 
@@ -96,7 +96,7 @@ router.post("/", authMiddleware, upload.single("pdf"), async (req: Request, res:
 
     // Extract optional chat ID
     const chatId = req.body.chatid || null;
-
+    const { number } = req.body
     // Validate file upload
     if (!req.file) {
       return res.status(400).json({
@@ -124,7 +124,7 @@ router.post("/", authMiddleware, upload.single("pdf"), async (req: Request, res:
     }
 
     // Generate quiz using AI service
-    const quizData = await generateQuizWithGroq(pdfText);
+    const quizData = await generateQuizWithGroq(pdfText, number);
     console.log("🤖 Generated Quiz data:", {
       topic: quizData.topic,
       subject: quizData.subject,
@@ -199,15 +199,15 @@ router.post("/", authMiddleware, upload.single("pdf"), async (req: Request, res:
 
     // Insert questions (handle large sets with batching if needed)
     let insertedQuestions;
-    
+
     if (formattedQuestions.length > 50) {
       // Batch insert for large question sets
       insertedQuestions = [];
       const batchSize = 25;
-      
+
       for (let i = 0; i < formattedQuestions.length; i += batchSize) {
         const batch = formattedQuestions.slice(i, i + batchSize);
-        
+
         const { data: batchResult, error: batchError } = await supabase
           .from("quiz_questions")
           .insert(batch)
@@ -224,7 +224,7 @@ router.post("/", authMiddleware, upload.single("pdf"), async (req: Request, res:
         }
 
         insertedQuestions.push(...(batchResult || []));
-        
+
         // Small delay between batches
         if (i + batchSize < formattedQuestions.length) {
           await new Promise(resolve => setTimeout(resolve, 100));
@@ -281,7 +281,7 @@ router.post("/", authMiddleware, upload.single("pdf"), async (req: Request, res:
       message: "Quiz generated successfully from PDF"
     });
 
-  } catch (error:Error | any) {
+  } catch (error: Error | any) {
     console.error("❌ Error in PDF quiz generation:", error);
 
     // Handle specific error types
@@ -348,8 +348,8 @@ async function extractPdfText(pdfBuffer: Buffer): Promise<string> {
     console.log("📄 Starting PDF extraction, buffer size:", pdfBuffer.length);
 
     // For files over 3MB, limit pages severely to prevent crashes
-    const maxPages = pdfBuffer.length > 3000000 ? 10 : 
-                    pdfBuffer.length > 1000000 ? 20 : 0; // 0 = all pages
+    const maxPages = pdfBuffer.length > 3000000 ? 10 :
+      pdfBuffer.length > 1000000 ? 20 : 0; // 0 = all pages
 
     // Very short timeout for large files
     const timeout = pdfBuffer.length > 2000000 ? 15000 : 30000;

@@ -2,11 +2,12 @@
 import express, { Request, Response } from "express";
 import axios from "axios";
 import { authMiddleware } from "../../config/middleware";
-
+import dotenv from 'dotenv'
+dotenv.config()
 const router = express.Router();
 
 const YT_BASE = "https://www.googleapis.com/youtube/v3";
-const API_KEY = process.env.YOUTUBE_API_KEY;
+const API_KEY = process.env.YOUTUBE_API_KEY!;
 
 if (!API_KEY) {
   console.warn("[YouTube] YOUTUBE_API_KEY is not set. Requests will fail.");

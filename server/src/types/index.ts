@@ -4,6 +4,15 @@ export interface Auth {
   password: string
 }
 
+export interface Chat {
+  id: string;
+  title: string;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+  archived?: boolean;
+  project_id?: string | null;
+}
 
 export interface TelegramUser {
   id: number;

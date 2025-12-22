@@ -95,7 +95,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(data.user);
       await fetchUser(); // Fetch user after signup
       return true;
-    } catch (error: any) {
+ 2  } catch (error: any) {
       console.error("Signup Error:", error.response?.data?.error || error.message);
       return false;
     } finally {
@@ -219,9 +219,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  return (
-    <AuthContext.Provider
-      value={{
+  const value = {
         user,
         fetchUser,
         login,
@@ -233,7 +231,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         loading,
         Onboarding,
         UpdateProfile,
-      }}
+      }
+
+  return (
+    <AuthContext.Provider
+      value={value}
     >
       {children}
     </AuthContext.Provider>

@@ -199,7 +199,7 @@ export default function AskQuestion() {
   return (
     <div className="flex flex-col h-full w-full bg-zinc-950 overflow-hidden">
       {/* Header - Only show if chatId exists */}
-      {chatId && (
+      {/* {chatId && (
         <div className="flex-shrink-0 flex justify-between items-center px-3 py-2.5 border-b border-zinc-800 bg-zinc-900/95 backdrop-blur-sm w-full">
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <h1 className="text-sm font-semibold truncate text-white">Acadex AI</h1>
@@ -208,7 +208,7 @@ export default function AskQuestion() {
             <BookmarkToggleButton itemId={chatId} type="chat" />
           </button>
         </div>
-      )}
+      )} */}
 
       {/* Main Content Area */}
       <div className="flex-1 overflow-y-auto scrollbar-thumb-black scrollbar-track-slate-900 overflow-x-hidden w-full">

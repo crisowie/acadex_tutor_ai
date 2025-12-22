@@ -19,11 +19,13 @@ import {
 } from "lucide-react";
 import { resources } from "@/types";
 
+ // axios.defaults.baseURL = "https://acadex-tutor-ai.onrender.com";
+
+  axios.defaults.baseURL = "http://localhost:5050";
+
 export default function Resources() {
   axios.defaults.withCredentials = true;
-  axios.defaults.baseURL = "https://acadex-tutor-ai.onrender.com";
-
-  // axios.defaults.baseURL = "http://localhost:5050";
+ 
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);

@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import Quizzes from "./pages/Quizzes";
 import QuizPage from "./pages/QuizPage";
 import Resources from "./pages/Resources";
+import ProjectPage from "./pages/projects";
 import Settings from "./pages/Settings";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -32,6 +33,8 @@ import { WatchPage } from "./pages/WatchPage";
 import OnboardingPage from "./pages/Onboarding";
 import { QuizProvider } from "@/context/QuizContext";
 import Notes from "./pages/Notes";
+import ProjectWorkSpace from "./pages/projectID"
+import SharedChat from "./pages/ShareChat";
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -60,6 +63,7 @@ const App = () => {
                   <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/signup" element={<Signup />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/share/:shareId" element={<SharedChat />} />
 
                   {/* Protected Routes with Layout */}
                   <Route
@@ -68,6 +72,16 @@ const App = () => {
                       <ProtectedRoute>
                         <Layout>
                           <Dashboard />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/projects/:id"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <ProjectWorkSpace />
                         </Layout>
                       </ProtectedRoute>
                     }
@@ -98,6 +112,16 @@ const App = () => {
                     element={
                       <ProtectedRoute>
                         <OnboardingPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/projects"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <ProjectPage />
+                        </Layout>
                       </ProtectedRoute>
                     }
                   />

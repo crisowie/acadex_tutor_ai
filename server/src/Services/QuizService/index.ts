@@ -5,6 +5,7 @@ import historyQuizRouter from "./quizHistory";
 import submitRoute from "./submitAnswer";
 import delteRoute from "./deleteQuiz";
 import pdfQuizRoute from "./pdfQuiz";
+import RenameChat from "./renameChat"
 const router = express.Router();
 
 // /quiz/chat/:chatId

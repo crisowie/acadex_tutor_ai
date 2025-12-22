@@ -6,7 +6,7 @@ import { generateQuizWithGroq } from "./quizService";
 const router = express.Router();
 
 router.post("/", authMiddleware, async (req: Request, res: Response) => {
-  const { topic, score } = req.body;
+  const { topic, score, number } = req.body;
   const userId = (req as any).user?.userId;
 
   if (!topic) {
@@ -15,7 +15,7 @@ router.post("/", authMiddleware, async (req: Request, res: Response) => {
 
   try {
     // 1. Generate quiz with AI
-    const quizData = await generateQuizWithGroq(topic);
+    const quizData = await generateQuizWithGroq(topic, number);
 
     if (!quizData.questions || quizData.questions.length < 5) {
       return res.status(500).json({ success: false, error: "Invalid quiz generated" });

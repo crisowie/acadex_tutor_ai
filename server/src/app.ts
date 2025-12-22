@@ -13,6 +13,7 @@ import Chat from './Services/ChatService/index';
 import youtubeRoutes from './Services/Google/YoutubeAPI';
 import NotesRoutes from './Services/NoteService';
 import { QuizRoutes } from './Services/QuizService';
+import Resources from "./Services/Resource/getResource"
 dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 5050
@@ -84,6 +85,7 @@ app.use("/api", Chat)
 // Youtube Api
 app.use("/api/youtube", youtubeRoutes);
 
+app.use("/resources", Resources)
 // Quiz Routes
 app.use("/quiz", QuizRoutes);
 

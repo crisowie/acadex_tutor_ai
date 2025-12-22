@@ -24,13 +24,13 @@ const Navbar = () => {
           <h1><a href="/">acadex.ai</a> </h1>
         </div>
 
-        <div className="flex p-2 px-3.5 rounded-2xl  max-lg:hidden gap-4 border border-green-600  text-gray-200">
+        <ul className="flex p-2 px-3.5 rounded-2xl  max-lg:hidden gap-4 border border-green-600  text-gray-200">
           <li className="hover:text-green-500" onClick={handleChange}><a className="" href="/#features">Features</a></li>
           <li className="hover:text-green-500" onClick={handleChange}> <a href="#how-it-work">How It Works</a></li>
           <li className="hover:text-green-500" onClick={handleChange}>  <a href="#testimonial">Testimonial</a></li>
           <li className="hover:text-green-500" onClick={handleChange}><a href="#pricing">Pricing</a></li>
           <li className="hover:text-green-500" onClick={handleChange}><a href="#faqs">FAQs</a></li>
-        </div>
+        </ul>
         <div >
           <ul className="flex gap-3 items-center max-lg:hidden  text-gray-200">
             <li>

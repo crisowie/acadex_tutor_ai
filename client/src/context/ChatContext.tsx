@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Chat, ChatContextType } from "@/types";
 import { Message } from "@/types";
 import { useChatHistory } from "@/hooks/useChatHistory";
+import { toast } from "@/components/ui/use-toast";
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
 axios.defaults.withCredentials = true;
@@ -27,7 +28,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const [chatId, setChatId] = useState<string | null>(null); // add chatId tracking
   const { chatHistory, refresh } = useChatHistory()
   const navigate = useNavigate();
-
+  const [bookmark,setBookmarks] = useState<any []>()
 
   const sendMessage = async (userMessage: string) => {
     setLoading(true);
@@ -103,7 +104,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   };
 
   // inside ChatContext or PdfContext
-  const summarizePDF = async (pdfFile: File, chat_id: string) : Promise<{ chat_id: string; aiReply: string; resources: any[] }> => {
+  const summarizePDF = async (pdfFile: File, chat_id: string): Promise<{ chat_id: string; aiReply: string; resources: any[] }> => {
     setLoading(true);
 
     const formData = new FormData();
@@ -172,7 +173,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }; 
 
   const fetchSingleChat = async (id: string) => {
     try {
@@ -194,9 +195,82 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       setLoading(false);
     }
   };
+  // 🔹 Delete chat function
+  const deleteChat = async (chatId: string) => {
+    // optimistic update pattern:
+    const prev = chats;
+    setChat(current => current.filter(c => c.id !== chatId));
+
+    try {
+      const res = await axios.delete(`/api/delete-chat/${chatId}`);
+      if (!(res.status === 200 || res.status === 204)) {
+        // rollback on unexpected response
+        setChat(prev);
+        console.error("Delete returned unexpected status:", res.status, res.data);
+        return false
+      } else {
+        return true
+      }
+    } catch (err: any) {
+      // rollback on error
+      setChat(prev);
+      console.error("Failed to delete chat (server):", err.response?.data ?? err.message);
+    }
+  };
+
+  const shareChat = async (chatId: string) => {
+    try {
+      const res = await axios.post(`/api/share/${chatId}`);
+      const shareUrl = res.data.shareUrl;
+      await navigator.clipboard.writeText(shareUrl);
+      return shareUrl;
+    } catch (error: any) {
+      console.error("Share chat error:", error);
+      throw error; // ✅ Throw error instead of returning undefined
+    }
+  };
+
+  const OpenChat = useCallback(async (shareId: string) => {
+    try {
+      const res = await axios.get(`/api/get-share/${shareId}`);
+      if (res.data?.messages && Array.isArray(res.data.messages)) {
+        setMessages(res.data.messages);
+      } else {
+        console.warn("No messages found in shared chat");
+      }
+      return res.data;
+    } catch (error) {
+      console.error("Open shared chat error:", error);
+    }
+  }, []);
+
+  const RenameChat = async (chatId: string, newName: string) => {
+    try {
+      const res = await axios.patch(`/api/rename-chat/${chatId}`, { newName }); // match backend
+      if (res.data?.chat) {
+        setChat((prevChats) =>
+          prevChats.map((chat) => (chat.id === chatId ? { ...chat, title: newName } : chat))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to rename chat:", error);
+    }
+  };
+
+  const BookmarkHistory = async ()=>{
+    const response = await axios.get("/api/history")
+    if(response.data.bookmarks && Array.isArray(response.data)){
+      setBookmarks(response.data || [])
+    }else{
+      setBookmarks([])
+    }
+  }
+  
+
+  const value = { messages, setMessages, sendMessage, loading, chatId, loadChatHistory, startNewChat, chats, setChat, fetchSingleChat, summarizePDF, deleteChat, shareChat, OpenChat, RenameChat,BookmarkHistory };
 
   return (
-    <ChatContext.Provider value={{ messages, setMessages, sendMessage, loading, chatId, loadChatHistory, startNewChat, chats, setChat, fetchSingleChat, summarizePDF }}>
+    <ChatContext.Provider value={value}>
       {children}
     </ChatContext.Provider>
   );

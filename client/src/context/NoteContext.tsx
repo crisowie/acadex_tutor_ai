@@ -9,6 +9,19 @@ axios.defaults.baseURL = "https://acadex-tutor-ai.onrender.com";
 // axios.defaults.baseURL ="http://localhost:5050";
 // Create Auth Context
 
+// const navigation = [
+//   { title: "AI Mentor", url: "/ask", icon: MessageSquare, action: "new-chat" },
+//   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+//   { title: "Quizzes", url: "/quizzes", icon: BookOpen },
+//   { title: "Notes", url: "/note", icon: NotebookPen },
+//   { title: "Projects", url: "/projects", icon: FolderPlus },
+//   // { title: "Account", url: "/account", icon: User },
+//   // { title: "Bookmarks", url: "/bookmarks", icon: Bookmark },
+//   { title: "Resources", url: "/resources", icon: Library },
+//   // { title: "Community", url: "/community", icon: Users2 },
+//   // { title: "Beta Features", url: "/beta", icon: LightbulbIcon },
+//   // { title: "Profile Setup", url: "/profile-setup", icon: User },
+// ];
 
 const NotesContext = createContext<NotesContextType | undefined>(undefined);
 
