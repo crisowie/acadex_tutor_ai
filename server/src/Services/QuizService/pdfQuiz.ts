@@ -124,7 +124,7 @@ router.post("/", authMiddleware, upload.single("pdf"), async (req: Request, res:
     }
 
     // Generate quiz using AI service
-    const quizData = await generateQuizWithGroq(pdfText, number);
+    const quizData = await generateQuizWithGroq(pdfText);
     console.log("🤖 Generated Quiz data:", {
       topic: quizData.topic,
       subject: quizData.subject,

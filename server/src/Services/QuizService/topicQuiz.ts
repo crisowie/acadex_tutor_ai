@@ -15,7 +15,7 @@ router.post("/", authMiddleware, async (req: Request, res: Response) => {
 
   try {
     // 1. Generate quiz with AI
-    const quizData = await generateQuizWithGroq(topic, number);
+    const quizData = await generateQuizWithGroq(topic);
 
     if (!quizData.questions || quizData.questions.length < 5) {
       return res.status(500).json({ success: false, error: "Invalid quiz generated" });
